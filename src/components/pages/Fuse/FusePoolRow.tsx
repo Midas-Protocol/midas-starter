@@ -1,13 +1,11 @@
 import { ChevronDownIcon, ChevronUpIcon, LinkIcon } from '@chakra-ui/icons';
 import {
   AvatarGroup,
-  Box,
   Button,
   Link as ChakraLink,
   Heading,
   IconButton,
   Text,
-  Tooltip,
 } from '@chakra-ui/react';
 import { USDPricedFuseAsset } from '@midas-capital/sdk';
 import { motion } from 'framer-motion';
@@ -15,7 +13,7 @@ import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import CTokenIcon from '@components/pages/Fuse/CTokenIcon';
+import { CTokenIcon } from '@components/shared/CTokenIcon';
 import { SimpleTooltip } from '@components/shared/SimpleTooltip';
 import { useRari } from '@context/RariContext';
 import { MergedPool } from '@hooks/fuse/useFusePools';
@@ -25,30 +23,10 @@ import {
 } from '@hooks/rewards/useRewardsDistributorsForPool';
 import { useColors } from '@hooks/useColors';
 import { useFusePoolData } from '@hooks/useFusePoolData';
-import { letterScore, usePoolRSS } from '@hooks/useRSS';
 import { convertMantissaToAPR, convertMantissaToAPY } from '@utils/apyUtils';
 import { smallUsdFormatter } from '@utils/bigUtils';
 import { Column, Row } from '@utils/chakraUtils';
 import { shortAddress } from '@utils/shortAddress';
-
-export const usePoolRiskScoreGradient = (rssScore: ReturnType<typeof letterScore> | '?') => {
-  const { cRssScore } = useColors();
-  return useMemo(() => {
-    return {
-      'A++': cRssScore.bgColor,
-      'A+': cRssScore.bgColor,
-      A: cRssScore.bgColor,
-      'A-': cRssScore.bgColor,
-      B: cRssScore.bgColor,
-      C: cRssScore.bgColor,
-      D: cRssScore.bgColor,
-      F: cRssScore.bgColor,
-      UNSAFE: cRssScore.bgColor,
-      '?': cRssScore.bgColor,
-    }[rssScore];
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rssScore]);
-};
 
 export const usePoolDetails = (assets: USDPricedFuseAsset[] | undefined) => {
   return useMemo(() => {
@@ -85,23 +63,14 @@ export const usePoolDetails = (assets: USDPricedFuseAsset[] | undefined) => {
   }, [assets]);
 };
 
-const PoolRow = ({
-  data: pool,
-  isMostSupplied,
-}: {
-  data: MergedPool;
-  isMostSupplied?: boolean;
-}) => {
+const PoolRow = ({ data: pool }: { data: MergedPool }) => {
   const { data: fusePoolData } = useFusePoolData(pool.id.toString());
-  const rss = usePoolRSS(pool.id);
-  const rssScore = rss ? letterScore(rss.totalScore) : '?';
   const tokens = useMemo(() => {
     return pool.underlyingTokens.map((address, index) => ({
       address,
       symbol: pool.underlyingSymbols[index],
     }));
   }, [pool.underlyingSymbols, pool.underlyingTokens]);
-  const scoreGradient = usePoolRiskScoreGradient(rssScore);
   const poolDetails = usePoolDetails(fusePoolData?.assets);
 
   const { data: rewardsDistributors } = useRewardsDistributorsForPool(fusePoolData?.comptroller);
@@ -124,32 +93,12 @@ const PoolRow = ({
         mainAxisAlignment="space-around"
         borderWidth={4}
         borderRadius={12}
-        borderColor={
-          (isMostSupplied && showItem[`${pool.id}`]) ||
-          (rewardsDistributors && rewardsDistributors.length !== 0)
-            ? 'transparent'
-            : cCard.borderColor
-        }
-        background={
-          showItem[`${pool.id}`] || (rewardsDistributors && rewardsDistributors.length !== 0)
-            ? `linear-gradient(${cCard.bgColor}, ${cCard.bgColor}) padding-box, conic-gradient(red, orange, yellow, lime, aqua, blue, magenta, red) border-box`
-            : isMostSupplied
-            ? cCard.hoverBgColor
-            : cCard.bgColor
-        }
+        borderColor={cCard.borderColor}
+        background={cCard.bgColor}
         width="100%"
-        _hover={
-          !showItem[`${pool.id}`]
-            ? rewardsDistributors && rewardsDistributors.length !== 0
-              ? {
-                  background: `linear-gradient(${cCard.hoverBgColor}, ${cCard.hoverBgColor}) padding-box, conic-gradient(red, orange, yellow, lime, aqua, blue, magenta, red) border-box`,
-                }
-              : isMostSupplied
-              ? { background: cCard.bgColor }
-              : { background: cCard.hoverBgColor }
-            : undefined
-        }
+        _hover={!showItem[`${pool.id}`] ? { background: cCard.hoverBgColor } : undefined}
         color={cCard.txtColor}
+        minHeight={20}
       >
         <Row
           borderBottomWidth={showItem[`${pool.id}`] ? 2 : 0}
@@ -188,20 +137,7 @@ const PoolRow = ({
               </Row>
             )}
           </Column>
-          <Column mainAxisAlignment="center" crossAxisAlignment="center" width="15%">
-            <Tooltip
-              label={'Underlying RSS: ' + (rss ? rss.totalScore.toFixed(2) : '?') + '%'}
-              placement="top"
-              hasArrow
-            >
-              <Box background={scoreGradient} px="4" py="2" borderRadius="5px">
-                <Text fontSize="lg" textColor="white" fontWeight="semibold">
-                  {rssScore}
-                </Text>
-              </Box>
-            </Tooltip>
-          </Column>
-          <Column mainAxisAlignment="center" crossAxisAlignment="center" width="20%">
+          <Column mainAxisAlignment="center" crossAxisAlignment="center" width="25%">
             {pool.underlyingTokens.length === 0 ? null : (
               <AvatarGroup size="sm" max={30}>
                 {tokens.slice(0, 10).map(({ address }) => {
@@ -210,12 +146,12 @@ const PoolRow = ({
               </AvatarGroup>
             )}
           </Column>
-          <Column mainAxisAlignment="center" crossAxisAlignment="center" width="10%">
+          <Column mainAxisAlignment="center" crossAxisAlignment="center" width="15%">
             <Text fontWeight="bold" textAlign="center">
               {smallUsdFormatter(pool.suppliedUSD)}
             </Text>
           </Column>
-          <Column mainAxisAlignment="center" crossAxisAlignment="center" width="13%">
+          <Column mainAxisAlignment="center" crossAxisAlignment="center" width="18%">
             <Text fontWeight="bold" textAlign="center">
               {smallUsdFormatter(pool.borrowedUSD)}
             </Text>
@@ -244,9 +180,7 @@ const PoolRow = ({
                   </Row>
                   <Row crossAxisAlignment="center" mainAxisAlignment="center" width="100%">
                     <Text fontWeight="bold" textAlign="center">
-                      {isMostSupplied
-                        ? fusePoolData && smallUsdFormatter(fusePoolData.totalBorrowBalanceUSD)
-                        : '$0.00'}
+                      {fusePoolData && smallUsdFormatter(fusePoolData.totalBorrowBalanceUSD)}
                     </Text>
                   </Row>
                 </Column>
@@ -258,9 +192,7 @@ const PoolRow = ({
                   </Row>
                   <Row crossAxisAlignment="center" mainAxisAlignment="center" width="100%">
                     <Text fontWeight="bold" textAlign="center">
-                      {isMostSupplied
-                        ? fusePoolData && smallUsdFormatter(fusePoolData.totalSupplyBalanceUSD)
-                        : '$0.00'}
+                      {fusePoolData && smallUsdFormatter(fusePoolData.totalSupplyBalanceUSD)}
                     </Text>
                   </Row>
                 </Column>
@@ -369,7 +301,7 @@ const PoolRow = ({
                   <Column mainAxisAlignment="center" crossAxisAlignment="flex-start">
                     <Row crossAxisAlignment="center" mainAxisAlignment="flex-start">
                       <Text fontWeight="bold" textAlign="center">
-                        {shortAddress(fusePoolData?.comptroller)}
+                        {shortAddress(fusePoolData?.comptroller, 4, 2)}
                       </Text>
                       <SimpleTooltip
                         placement="top-start"

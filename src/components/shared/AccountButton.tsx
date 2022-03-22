@@ -1,3 +1,4 @@
+import { ExternalLinkIcon } from '@chakra-ui/icons';
 import {
   AvatarGroup,
   Button,
@@ -15,13 +16,12 @@ import { ClaimableReward } from '@midas-capital/sdk/dist/cjs/src/modules/Rewards
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import CTokenIcon from '@components/pages/Fuse/CTokenIcon';
 import ClaimRewardsModal from '@components/pages/Fuse/Modals/ClaimRewardsModal';
+import { CTokenIcon } from '@components/shared/CTokenIcon';
 import { GlowingBox } from '@components/shared/GlowingBox';
 import Jazzicon from '@components/shared/Jazzicon';
 import { ModalDivider, ModalTitleWithCloseButton } from '@components/shared/Modal';
 import SwitchNetworkButton from '@components/shared/SwitchNetworkButton';
-import { LanguageSelect } from '@components/shared/TranslateButton';
 import { useRari } from '@context/RariContext';
 import { useAllClaimableRewards } from '@hooks/rewards/useAllClaimableRewards';
 import { useAuthedCallback } from '@hooks/useAuthedCallback';
@@ -54,7 +54,7 @@ const ClaimRewardsButton = () => {
   } = useDisclosure();
   const authedOpenModal = useAuthedCallback(openClaimModal);
 
-  const { cSolidBtn } = useColors();
+  const { cSolidBtn, cCard } = useColors();
   const { t } = useTranslation();
 
   const { data: claimableRewards } = useAllClaimableRewards();
@@ -81,7 +81,7 @@ const ClaimRewardsButton = () => {
                 return <CTokenIcon key={index} address={rD.rewardToken} />;
               })}
             </AvatarGroup>
-            <Text ml={1} mr={1} fontWeight="semibold">
+            <Text ml={1} mr={1} fontWeight="semibold" color={cCard.txtColor}>
               {t('Claim Rewards')}
             </Text>
           </Center>
@@ -135,13 +135,13 @@ const Buttons = ({ openModal }: { openModal: () => void }) => {
                   <Jazzicon diameter={23} address={address} style={{ display: 'contents' }} />
                 </Stack>
                 <Text ml={2} mt={1} fontWeight="semibold">
-                  {shortAddress(address)}
+                  {shortAddress(address, 4, 2)}
                 </Text>
               </>
             ) : (
               <>
                 <Text mr={2} fontWeight="semibold">
-                  {pendingTxHashes.length} Pending
+                  {pendingTxHashes.length} {t('Pending')}
                 </Text>
                 <Spinner w={5} h={5} />
               </>
@@ -156,7 +156,7 @@ const Buttons = ({ openModal }: { openModal: () => void }) => {
 export const SettingsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const { t } = useTranslation();
 
-  const { login, logout, pendingTxHashes, fuse } = useRari();
+  const { login, logout, pendingTxHashes, fuse, scanUrl } = useRari();
   const { cSolidBtn, cCard } = useColors();
   const modalStyle = {
     backgroundColor: cCard.bgColor,
@@ -232,9 +232,7 @@ export const SettingsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: (
           >
             {t('Disconnect')}
           </Button>
-
-          <LanguageSelect />
-          <Row
+          <Column
             mainAxisAlignment="center"
             crossAxisAlignment="center"
             mt={4}
@@ -242,13 +240,31 @@ export const SettingsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: (
             color={cCard.txtColor}
           >
             {!pendingTxHashes.length ? (
-              <Text>Your transactions will appear here</Text>
+              <Text fontSize={20} mb={4}>
+                {t('Your transactions will appear here')}
+              </Text>
             ) : (
               <>
-                <Text>Recent transactions</Text>
+                <Text fontSize={20} mb={4}>
+                  {t('Pending transactions')}
+                </Text>
+                {pendingTxHashes.map((hash, index) => (
+                  <Button
+                    key={index}
+                    href={`${scanUrl}/tx/${hash}`}
+                    rightIcon={<ExternalLinkIcon />}
+                    color={cCard.txtColor}
+                    variant={'link'}
+                    as={Link}
+                    isExternal
+                    width="100%"
+                  >
+                    {shortAddress(hash, 12, 10)}
+                  </Button>
+                ))}
               </>
             )}
-          </Row>
+          </Column>
 
           <Row
             mainAxisAlignment="center"

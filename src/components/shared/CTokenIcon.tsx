@@ -1,31 +1,41 @@
-import { Avatar, AvatarGroup, AvatarGroupProps, AvatarProps } from '@chakra-ui/avatar';
-import { Tooltip } from '@chakra-ui/react';
-import React from 'react';
+import {
+  Avatar,
+  AvatarGroup,
+  AvatarGroupProps,
+  AvatarProps,
+  Tooltip,
+  useColorMode,
+} from '@chakra-ui/react';
+import { motion } from 'framer-motion';
 
 import { useTokenData } from '@hooks/useTokenData';
 
 export const CTokenIcon = ({
   address,
   ...avatarProps
-}: {
-  address: string;
-} & Partial<AvatarProps>) => {
+}: { address: string } & Partial<AvatarProps>) => {
   const { data: tokenData } = useTokenData(address);
+  const { colorMode } = useColorMode();
 
   return (
-    <Tooltip label={tokenData?.symbol}>
-      <Avatar
-        {...avatarProps}
-        key={address}
-        bg="#FFF"
-        borderWidth="1px"
-        name={tokenData?.symbol ?? 'Loading...'}
-        src={
-          tokenData?.logoURL ??
-          'https://raw.githubusercontent.com/feathericons/feather/master/icons/help-circle.svg'
-        }
-      />
-    </Tooltip>
+    <motion.div whileHover={{ scale: 1.2 }}>
+      <Tooltip label={tokenData?.symbol ?? 'Loading...'}>
+        <Avatar
+          {...avatarProps}
+          key={address}
+          bg={'transparent'}
+          borderWidth="1px"
+          name={tokenData?.symbol ?? 'Loading...'}
+          borderColor={'transparent'}
+          src={
+            tokenData?.logoURL ||
+            (colorMode === 'light'
+              ? '/images/help-circle-dark.svg'
+              : '/images/help-circle-light.svg')
+          }
+        />
+      </Tooltip>
+    </motion.div>
   );
 };
 

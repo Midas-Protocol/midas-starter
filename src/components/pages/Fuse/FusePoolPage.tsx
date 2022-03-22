@@ -6,19 +6,11 @@ import {
   BoxProps,
   Button,
   Link as ChakraLink,
-  Stat as ChakraStat,
-  StatLabel as ChakraStatLabel,
-  StatNumber as ChakraStatNumber,
   Divider,
   Flex,
   Heading,
   HStack,
-  Progress,
-  SimpleGrid,
   Skeleton,
-  StatLabelProps,
-  StatNumberProps,
-  StatProps,
   Switch,
   Table,
   TableCaption,
@@ -26,8 +18,8 @@ import {
   Td,
   Text,
   Thead,
-  Tooltip,
   Tr,
+  useColorMode,
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
@@ -42,11 +34,9 @@ import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 
-import CTokenIcon from '@components/pages/Fuse/CTokenIcon';
-import FuseNavbar from '@components/pages/Fuse/FuseNavbar';
-import { PoolInfoBox } from '@components/pages/Fuse/FusePoolInfoPage';
+import FusePageLayout from '@components/pages/Fuse/FusePageLayout';
 import PoolModal, { Mode } from '@components/pages/Fuse/Modals/PoolModal/index';
-import { CTokenAvatarGroup } from '@components/shared/CTokenIcon';
+import { CTokenAvatarGroup, CTokenIcon } from '@components/shared/CTokenIcon';
 import { GlowingBox } from '@components/shared/GlowingBox';
 import PageTransitionLayout from '@components/shared/PageTransitionLayout';
 import { SimpleTooltip } from '@components/shared/SimpleTooltip';
@@ -54,7 +44,6 @@ import { SwitchCSS } from '@components/shared/SwitchCSS';
 import { useRari } from '@context/RariContext';
 import { IncentivesData, usePoolIncentives } from '@hooks/rewards/usePoolIncentives';
 import { useAuthedCallback } from '@hooks/useAuthedCallback';
-import { useBorrowLimit } from '@hooks/useBorrowLimit';
 import { useColors } from '@hooks/useColors';
 import { useFusePoolData } from '@hooks/useFusePoolData';
 import { useIsSemiSmallScreen } from '@hooks/useIsSemiSmallScreen';
@@ -63,7 +52,6 @@ import { useTokenData } from '@hooks/useTokenData';
 import { TokensDataMap } from '@type/tokens';
 import { convertMantissaToAPR, convertMantissaToAPY } from '@utils/apyUtils';
 import {
-  midUsdFormatter,
   shortFormatter,
   shortUsdFormatter,
   smallUsdFormatter,
@@ -83,7 +71,7 @@ const FuseRewardsBanner = ({ rewardTokensData }: { rewardTokensData: TokensDataM
       <GlowingBox w="100%" h="50px" mt={4}>
         <Row mainAxisAlignment="flex-start" crossAxisAlignment="center" h="100%" w="100" p={3}>
           <Heading fontSize="md" ml={2}>
-            🎉 This pool is offering rewards
+            This pool is offering rewards
           </Heading>
           <CTokenAvatarGroup
             tokenAddresses={Object.keys(rewardTokensData)}
@@ -97,49 +85,8 @@ const FuseRewardsBanner = ({ rewardTokensData }: { rewardTokensData: TokensDataM
   );
 };
 
-const StatLabel = (props: StatLabelProps) => {
-  const { cPage } = useColors();
-  return (
-    <ChakraStatLabel
-      fontWeight="medium"
-      fontFamily="Manrope"
-      isTruncated
-      color={cPage.secondary.txtColor}
-      {...props}
-    />
-  );
-};
-
-const StatNumber = (props: StatNumberProps) => {
-  const { cPage } = useColors();
-  return (
-    <ChakraStatNumber
-      fontSize={['3xl', '3xl', '2xl', '3xl']}
-      fontWeight="medium"
-      fontFamily="Manrope"
-      color={cPage.secondary.txtColor}
-      {...props}
-    />
-  );
-};
-
-const Stat = (props: StatProps) => {
-  const { cPage } = useColors();
-  return (
-    <ChakraStat
-      px={{ base: 4, sm: 6 }}
-      py="5"
-      bg={cPage.secondary.bgColor}
-      fontFamily="Manrope"
-      shadow="base"
-      rounded="lg"
-      {...props}
-    />
-  );
-};
-
 const FusePoolPage = memo(() => {
-  const { setLoading, fuse } = useRari();
+  const { setLoading } = useRari();
   const isMobile = useIsSemiSmallScreen();
   const router = useRouter();
   const poolId = router.query.poolId as string;
@@ -157,151 +104,105 @@ const FusePoolPage = memo(() => {
       )}
 
       <PageTransitionLayout>
-        <Flex
-          minH="100vh"
-          flexDir="column"
-          alignItems="flex-start"
-          bgColor={cPage.primary.bgColor}
-          justifyContent="flex-start"
-        >
-          <FuseNavbar />
-          <HStack width={'100%'} mt="9%" mb={8} mx="auto" spacing={6}>
-            <ArrowBackIcon
-              fontSize="2xl"
-              fontWeight="extrabold"
-              cursor="pointer"
-              onClick={() => {
-                setLoading(true);
-                router.back();
-              }}
-            />
-            {data ? (
-              <Heading textAlign="left" fontSize="xl" fontWeight="bold">
-                {data.name}
-              </Heading>
-            ) : (
-              <Skeleton>hello</Skeleton>
-            )}
-            {data?.assets && data?.assets?.length > 0 ? (
-              <>
-                <AvatarGroup size="sm" max={30}>
-                  {data?.assets.map(
-                    ({ underlyingToken, cToken }: { underlyingToken: string; cToken: string }) => {
-                      return <CTokenIcon key={cToken} address={underlyingToken} />;
-                    }
-                  )}
-                </AvatarGroup>
-              </>
-            ) : null}
-          </HStack>
-          {hasIncentives && (
-            <FuseRewardsBanner rewardTokensData={incentivesData.rewardTokensData} />
-          )}
-          <Box as="section" bg={cPage.primary.bgColor} py="4" width={'100%'} alignSelf={'center'}>
-            <Box mx="auto">
-              <Heading marginBottom={'4'} fontWeight="semibold" fontSize={'2xl'}>
-                Pool Statistics
-              </Heading>
-              <SimpleGrid columns={{ base: 2, md: 4 }} spacing="4">
-                <Stat borderRadius={12}>
-                  <StatLabel>{'Total Supply'}</StatLabel>
-                  <StatNumber fontWeight="bold">
-                    {data ? (
-                      midUsdFormatter(data.totalSuppliedUSD)
-                    ) : (
-                      <Skeleton mt="2">Num</Skeleton>
-                    )}
-                  </StatNumber>
-                </Stat>
-                <Stat borderRadius={12}>
-                  <StatLabel>{'Total Borrow'}</StatLabel>
-                  <StatNumber fontWeight="bold">
-                    {data ? (
-                      midUsdFormatter(data?.totalBorrowedUSD)
-                    ) : (
-                      <Skeleton mt="2">Num</Skeleton>
-                    )}
-                  </StatNumber>
-                </Stat>
-                <Stat borderRadius={12}>
-                  <StatLabel>{'Liquidity'}</StatLabel>
-                  <StatNumber fontWeight="bold">
-                    {data ? (
-                      midUsdFormatter(data?.totalLiquidityUSD)
-                    ) : (
-                      <Skeleton mt="2">Num</Skeleton>
-                    )}
-                  </StatNumber>
-                </Stat>
-                <Stat borderRadius={12}>
-                  <StatLabel>{'Pool Utilization'}</StatLabel>
-                  <StatNumber fontWeight="bold">
-                    {data ? (
-                      data.totalSuppliedUSD.toString() === '0' ? (
-                        '0%'
-                      ) : (
-                        ((data?.totalBorrowedUSD / data?.totalSuppliedUSD) * 100).toFixed(2) + '%'
-                      )
-                    ) : (
-                      <Skeleton mt="2">Num</Skeleton>
-                    )}
-                  </StatNumber>
-                </Stat>
-              </SimpleGrid>
-            </Box>
-          </Box>
-          {
-            /* If they have some asset enabled as collateral, show the collateral ratio bar */
-            data && data.assets.some((asset) => asset.membership) ? (
-              <CollateralRatioBar assets={data.assets} borrowUSD={data.totalBorrowBalanceUSD} />
-            ) : null
-          }
-          <RowOrColumn
-            width={'100%'}
-            mainAxisAlignment="flex-start"
-            crossAxisAlignment="flex-start"
+        <FusePageLayout>
+          <Flex
+            minH="100vh"
+            flexDir="column"
+            alignItems="flex-start"
             bgColor={cPage.primary.bgColor}
-            color={cPage.primary.txtColor}
-            mx="auto"
-            mt={4}
-            pb={4}
-            isRow={!isMobile}
-            alignItems="stretch"
+            justifyContent="flex-start"
+            width="100%"
           >
-            <PoolDashboardBox pb={2} width={isMobile ? '100%' : '50%'} borderRadius={12}>
+            <HStack width={'100%'} mt={12} mb={8} mx="auto" spacing={6}>
+              <ArrowBackIcon
+                fontSize="2xl"
+                fontWeight="extrabold"
+                cursor="pointer"
+                onClick={() => {
+                  setLoading(true);
+                  router.back();
+                }}
+              />
               {data ? (
-                <SupplyList
-                  assets={data.assets}
-                  comptrollerAddress={data.comptroller}
-                  supplyBalanceUSD={data.totalSupplyBalanceUSD}
-                  rewards={rewards}
-                />
+                <Heading textAlign="left" fontSize="xl" fontWeight="bold">
+                  {data.name}
+                </Heading>
               ) : (
-                <TableSkeleton tableHeading="Your Supply Balance" />
+                <Skeleton>hello</Skeleton>
               )}
-            </PoolDashboardBox>
-
-            <PoolDashboardBox
-              ml={isMobile ? 0 : 4}
-              mt={isMobile ? 4 : 0}
-              pb={2}
-              borderRadius={12}
-              width={isMobile ? '100%' : '50%'}
+              {data?.assets && data?.assets?.length > 0 ? (
+                <>
+                  <AvatarGroup size="sm" max={30}>
+                    {data?.assets.map(
+                      ({
+                        underlyingToken,
+                        cToken,
+                      }: {
+                        underlyingToken: string;
+                        cToken: string;
+                      }) => {
+                        return <CTokenIcon key={cToken} address={underlyingToken} />;
+                      }
+                    )}
+                  </AvatarGroup>
+                </>
+              ) : null}
+            </HStack>
+            {hasIncentives && (
+              <FuseRewardsBanner rewardTokensData={incentivesData.rewardTokensData} />
+            )}
+            <Box as="section" bg={cPage.primary.bgColor} mt={8} width={'100%'} alignSelf={'center'}>
+              <Box mx="auto">
+                <Heading marginBottom={'4'} fontWeight="semibold" fontSize={'2xl'}>
+                  Pool Statistics
+                </Heading>
+              </Box>
+            </Box>
+            <RowOrColumn
+              width={'100%'}
+              mainAxisAlignment="flex-start"
+              crossAxisAlignment="flex-start"
+              bgColor={cPage.primary.bgColor}
+              color={cPage.primary.txtColor}
+              mx="auto"
+              mt={4}
+              pb={4}
+              isRow={!isMobile}
+              alignItems="stretch"
             >
-              {data ? (
-                <BorrowList
-                  comptrollerAddress={data.comptroller}
-                  assets={data.assets}
-                  borrowBalanceUSD={data.totalBorrowBalanceUSD}
-                />
-              ) : (
-                <TableSkeleton tableHeading="Your Borrow Balance" />
-              )}
-            </PoolDashboardBox>
-          </RowOrColumn>
-          <PoolInfoBox data={data} />
-          <Box h={'20'} />
-        </Flex>
+              <PoolDashboardBox pb={2} width={isMobile ? '100%' : '50%'} borderRadius={12}>
+                {data ? (
+                  <SupplyList
+                    assets={data.assets}
+                    comptrollerAddress={data.comptroller}
+                    supplyBalanceUSD={data.totalSupplyBalanceUSD}
+                    rewards={rewards}
+                  />
+                ) : (
+                  <TableSkeleton tableHeading="Your Supply Balance" />
+                )}
+              </PoolDashboardBox>
+
+              <PoolDashboardBox
+                ml={isMobile ? 0 : 4}
+                mt={isMobile ? 4 : 0}
+                pb={2}
+                borderRadius={12}
+                width={isMobile ? '100%' : '50%'}
+              >
+                {data ? (
+                  <BorrowList
+                    comptrollerAddress={data.comptroller}
+                    assets={data.assets}
+                    borrowBalanceUSD={data.totalBorrowBalanceUSD}
+                  />
+                ) : (
+                  <TableSkeleton tableHeading="Your Borrow Balance" />
+                )}
+              </PoolDashboardBox>
+            </RowOrColumn>
+          </Flex>
+        </FusePageLayout>
       </PageTransitionLayout>
     </>
   );
@@ -322,68 +223,6 @@ export const PoolDashboardBox = ({ children, ...props }: BoxProps) => {
     >
       {children}
     </Box>
-  );
-};
-
-const CollateralRatioBar = ({
-  assets,
-  borrowUSD,
-}: {
-  assets: USDPricedFuseAsset[];
-  borrowUSD: number;
-}) => {
-  const { t } = useTranslation();
-
-  const maxBorrow = useBorrowLimit(assets);
-
-  const ratio = (borrowUSD / maxBorrow) * 100;
-
-  useEffect(() => {
-    if (ratio > 95) {
-      LogRocket.track('Fuse-AtRiskOfLiquidation');
-    }
-  }, [ratio]);
-
-  return (
-    <PoolDashboardBox width={'100%'} height="65px" mt={4} p={4} mx="auto">
-      <Row mainAxisAlignment="flex-start" crossAxisAlignment="center" expand>
-        <Tooltip label={'Keep this bar from filling up to avoid being liquidated!'}>
-          <Text flexShrink={0} mr={4}>
-            Borrow Limit
-          </Text>
-        </Tooltip>
-
-        <Tooltip label={'This is how much you have borrowed.'}>
-          <Text flexShrink={0} mt="2px" mr={3} fontSize="10px">
-            {smallUsdFormatter(borrowUSD)}
-          </Text>
-        </Tooltip>
-
-        <Tooltip
-          label={`You're using ${ratio.toFixed(1)}% of your ${smallUsdFormatter(
-            maxBorrow
-          )} borrow limit.`}
-        >
-          <Box width="100%">
-            <Progress
-              size="xs"
-              width="100%"
-              colorScheme={
-                ratio <= 40 ? 'whatsapp' : ratio <= 60 ? 'yellow' : ratio <= 80 ? 'orange' : 'red'
-              }
-              borderRadius="10px"
-              value={ratio}
-            />
-          </Box>
-        </Tooltip>
-
-        <Tooltip label={t('If your borrow amount reaches this value, you will be liquidated.')}>
-          <Text flexShrink={0} mt="2px" ml={3} fontSize="10px">
-            {smallUsdFormatter(maxBorrow)}
-          </Text>
-        </Tooltip>
-      </Row>
-    </PoolDashboardBox>
   );
 };
 
@@ -589,6 +428,8 @@ const AssetSupplyRow = ({
     });
   }, [asset, rewards]);
 
+  const { colorMode } = useColorMode();
+
   return (
     <>
       <Tr style={{ position: 'absolute' }}>
@@ -618,8 +459,10 @@ const AssetSupplyRow = ({
               boxSize={{ base: '5vw', sm: '2.2rem' }}
               name={asset.underlyingSymbol}
               src={
-                tokenData?.logoURL ??
-                'https://raw.githubusercontent.com/feathericons/feather/master/icons/help-circle.svg'
+                tokenData?.logoURL ||
+                (colorMode === 'light'
+                  ? '/images/help-circle-dark.svg'
+                  : '/images/help-circle-light.svg')
               }
             />
             <Column mainAxisAlignment={'space-between'} crossAxisAlignment={'flex-start'}>
@@ -937,6 +780,8 @@ const AssetBorrowRow = ({
 
   const { cCard } = useColors();
 
+  const { colorMode } = useColorMode();
+
   return (
     <>
       <Tr style={{ position: 'absolute' }}>
@@ -970,8 +815,10 @@ const AssetBorrowRow = ({
               boxSize={{ base: '5vw', sm: '2.2rem' }}
               name={asset.underlyingSymbol}
               src={
-                tokenData?.logoURL ??
-                'https://raw.githubusercontent.com/feathericons/feather/master/icons/help-circle.svg'
+                tokenData?.logoURL ||
+                (colorMode === 'light'
+                  ? '/images/help-circle-dark.svg'
+                  : '/images/help-circle-light.svg')
               }
             />
             <Text fontWeight="bold" fontSize={{ base: '2.8vw', sm: '0.9rem' }} mx={2}>

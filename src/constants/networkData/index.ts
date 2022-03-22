@@ -1,7 +1,6 @@
 import { SupportedChains } from '@midas-capital/sdk';
 
 import BSC from '@constants/networkData/BSC';
-import Evmos from '@constants/networkData/Evmos';
 import Ganache from '@constants/networkData/Ganache';
 
 export interface ChainMetadata {
@@ -33,14 +32,12 @@ export const NETWORK_DATA: Record<string, ChainMetadata> = {
   [SupportedChains.ganache]: Ganache.testnet,
   [SupportedChains.bsc]: BSC.mainnet,
   [SupportedChains.chapel]: BSC.testnet,
-  [SupportedChains.evmos_testnet]: Evmos.testnet,
 };
 
 export const NATIVE_TOKEN_DATA: Record<number, ChainMetadata['nativeCurrency']> = {
   [SupportedChains.ganache]: Ganache.testnet.nativeCurrency,
   [SupportedChains.bsc]: BSC.mainnet.nativeCurrency,
   [SupportedChains.chapel]: BSC.testnet.nativeCurrency,
-  [SupportedChains.evmos_testnet]: Evmos.testnet.nativeCurrency,
 };
 
 export const isSupportedChainId = (chainId: number) => {

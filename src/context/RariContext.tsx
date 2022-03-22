@@ -90,8 +90,6 @@ export interface RariContextData {
   chainId: number | undefined;
   switchNetwork: (newChainId: number) => void;
   scanUrl: string | null;
-  viewMode: string;
-  setViewMode: Dispatch<string>;
   loading: boolean;
   setLoading: Dispatch<boolean>;
   pendingTxHashes: string[];
@@ -173,6 +171,7 @@ export const RariProvider = ({ children }: { children: ReactNode }) => {
             title: 'Complete!',
             description: (
               <Button
+                href={`${scanUrl}/tx/${tx.hash}`}
                 rightIcon={<ExternalLinkIcon />}
                 color={cPage.primary.bgColor}
                 variant={'link'}
@@ -211,11 +210,10 @@ export const RariProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (mounted.current) {
-      setPendingTxHashes((pendingTxHashes) => [
-        ...pendingTxHashes.filter((hash) => {
-          return hash !== finishedTxHash;
-        }),
-      ]);
+      const updatedTxHashes = [...pendingTxHashes].filter((hash) => {
+        return hash !== finishedTxHash;
+      });
+      setPendingTxHashes(updatedTxHashes);
     }
   }, [finishedTxHash]);
 
@@ -367,8 +365,6 @@ export const RariProvider = ({ children }: { children: ReactNode }) => {
       chainId,
       switchNetwork,
       scanUrl,
-      viewMode,
-      setViewMode,
       loading,
       setLoading,
       pendingTxHash,
@@ -386,8 +382,6 @@ export const RariProvider = ({ children }: { children: ReactNode }) => {
     chainId,
     refetchAccountData,
     scanUrl,
-    viewMode,
-    setViewMode,
     loading,
     setLoading,
     pendingTxHash,

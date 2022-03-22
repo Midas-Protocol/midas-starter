@@ -12,6 +12,7 @@ import {
   TabList,
   Tabs,
   Text,
+  useColorMode,
   useToast,
 } from '@chakra-ui/react';
 import { Fuse, USDPricedFuseAsset } from '@midas-capital/sdk';
@@ -23,7 +24,6 @@ import { ReactNode, useState } from 'react';
 import { useQuery } from 'react-query';
 import { HashLoader } from 'react-spinners';
 
-import { ComptrollerErrorCodes } from '@components/pages/Fuse/FusePoolEditPage';
 import { Mode } from '@components/pages/Fuse/Modals/PoolModal/index';
 import DashboardBox from '@components/shared/DashboardBox';
 import { ModalDivider } from '@components/shared/Modal';
@@ -66,6 +66,30 @@ export enum CTokenErrorCodes {
   TOKEN_TRANSFER_IN_FAILED,
   TOKEN_TRANSFER_OUT_FAILED,
   UTILIZATION_ABOVE_MAX,
+}
+
+export enum ComptrollerErrorCodes {
+  NO_ERROR,
+  UNAUTHORIZED,
+  COMPTROLLER_MISMATCH,
+  INSUFFICIENT_SHORTFALL,
+  INSUFFICIENT_LIQUIDITY,
+  INVALID_CLOSE_FACTOR,
+  INVALID_COLLATERAL_FACTOR,
+  INVALID_LIQUIDATION_INCENTIVE,
+  MARKET_NOT_ENTERED, // no longer possible
+  MARKET_NOT_LISTED,
+  MARKET_ALREADY_LISTED,
+  MATH_ERROR,
+  NONZERO_BORROW_BALANCE,
+  PRICE_ERROR,
+  REJECTION,
+  SNAPSHOT_ERROR,
+  TOO_MANY_ASSETS,
+  TOO_MUCH_REPAY,
+  SUPPLIER_NOT_WHITELISTED,
+  BORROW_BELOW_MIN,
+  SUPPLY_ABOVE_MAX,
 }
 
 interface Props {
@@ -348,6 +372,7 @@ const AmountSelect = ({
       setUserAction(UserAction.NO_ACTION);
     }
   };
+  const { colorMode } = useColorMode();
 
   return (
     <Column
@@ -360,7 +385,7 @@ const AmountSelect = ({
     >
       {userAction === UserAction.WAITING_FOR_TRANSACTIONS ? (
         <Column expand mainAxisAlignment="center" crossAxisAlignment="center" p={4}>
-          <HashLoader size={70} color={tokenData?.color ?? '#FFF'} loading />
+          <HashLoader size={70} color={cCard.txtColor} loading />
           <Heading mt="30px" textAlign="center" size="md">
             {t('Check your wallet to submit the transactions')}
           </Heading>
@@ -380,12 +405,15 @@ const AmountSelect = ({
           >
             <Box height="35px" width="35px">
               <Image
+                background={'transparent'}
                 width="100%"
                 height="100%"
                 borderRadius="50%"
                 src={
-                  tokenData?.logoURL ??
-                  'https://raw.githubusercontent.com/feathericons/feather/master/icons/help-circle.svg'
+                  tokenData?.logoURL ||
+                  (colorMode === 'light'
+                    ? '/images/help-circle-dark.svg'
+                    : '/images/help-circle-light.svg')
                 }
                 alt=""
               />
@@ -427,8 +455,10 @@ const AmountSelect = ({
                   <TokenNameAndMaxButton
                     mode={mode}
                     logoURL={
-                      tokenData?.logoURL ??
-                      'https://raw.githubusercontent.com/feathericons/feather/master/icons/help-circle.svg'
+                      tokenData?.logoURL ||
+                      (colorMode === 'light'
+                        ? '/images/help-circle-dark.svg'
+                        : '/images/help-circle-light.svg')
                     }
                     asset={asset}
                     updateAmount={updateAmount}
@@ -536,31 +566,6 @@ const TabBar = ({
   const isSupplySide = mode < 2;
   const { t } = useTranslation();
   const { cOutlineBtn } = useColors();
-
-  // Woohoo okay so there's some pretty weird shit going on in this component.
-  // yep. :upsidedownsmilieface:
-
-  // The AmountSelect component gets passed a `mode` param which is a `Mode` enum. The `Mode` enum has 4 values (SUPPLY, WITHDRAW, BORROW, REPAY).
-  // The `mode` param is used to determine what text gets rendered and what action to take on clicking the confirm button.
-
-  // As part of our simple design for the modal, we only show 2 mode options in the tab bar at a time.
-
-  // When the modal is triggered it is given a `defaultMode` (starting mode). This is passed in by the component which renders the modal.
-  // - If the user starts off in SUPPLY or WITHDRAW, we only want show them the option to switch between SUPPLY and WITHDRAW.
-  // - If the user starts off in BORROW or REPAY, we want to only show them the option to switch between BORROW and REPAY.
-
-  // However since the tab list has only has 2 tabs under it. It accepts an `index` parameter which determines which tab to show as "selected". Since we only show 2 tabs, it can either be 0 or 1.
-  // This means we can't just pass `mode` to `index` because `mode` could be 2 or 3 (for BORROW or REPAY respectively) which would be invalid.
-
-  // To solve this, if the mode is BORROW or REPAY we pass the index as `mode - 2` which transforms the BORROW mode to 0 and the REPAY mode to 1.
-
-  // However, we also need to do the opposite of that logic in `onChange`:
-  // - If a user clicks a tab and the current mode is SUPPLY or WITHDRAW we just pass that index (0 or 1 respectively) to setMode.
-  // - But if a user clicks on a tab and the current mode is BORROW or REPAY, we need to add 2 to the index of the tab so it's the right index in the `Mode` enum.
-  //   - Otherwise whenever you clicked on a tab it would always set the mode to SUPPLY or BORROW when clicking the left or right button respectively.
-
-  // Does that make sense? Everything I described above is basically a way to get around the tab component's understanding that it only has 2 tabs under it to make it fit into our 4 value enum setup.
-  // Still confused? DM me on Twitter (@transmissions11) for help.
 
   return (
     <>
@@ -811,14 +816,7 @@ const TokenNameAndMaxButton = ({
     <Row mainAxisAlignment="flex-start" crossAxisAlignment="center" flexShrink={0}>
       <Row mainAxisAlignment="flex-start" crossAxisAlignment="center">
         <Box height="25px" width="25px" mb="2px" mr={2}>
-          <Image
-            width="100%"
-            height="100%"
-            borderRadius="50%"
-            backgroundImage={`url(/images/small-white-circle.png)`}
-            src={logoURL}
-            alt=""
-          />
+          <Image width="100%" height="100%" borderRadius="50%" src={logoURL} alt="" />
         </Box>
         <Heading fontSize="24px" mr={2} flexShrink={0} color={cSolidBtn.primary.bgColor}>
           {asset.underlyingSymbol}

@@ -9,7 +9,6 @@ import {
 } from '@hooks/rewards/useRewardAPY';
 import { useTokensDataAsMap } from '@hooks/useTokenData';
 import { TokensDataMap } from '@type/tokens';
-import { createCToken } from '@utils/createComptroller';
 
 export interface CTokenRewardsDistributorIncentives {
   rewardsDistributorAddress: string;
@@ -114,29 +113,3 @@ export function usePoolIncentives(comptroller?: string): IncentivesData {
     rewardsDistributorCtokens,
   };
 }
-
-export interface CTokensUnderlyingMap {
-  [cTokenAddr: string]: string;
-}
-
-export const useCTokensUnderlying = (cTokenAddresses: string[]): CTokensUnderlyingMap => {
-  const { fuse, chainId } = useRari();
-  const { data: cTokensUnderlying } = useQuery(
-    ['CTokensUnderlying', chainId, cTokenAddresses?.join(',')],
-    async () => {
-      const _map: CTokensUnderlyingMap = {};
-      if (cTokenAddresses && cTokenAddresses.length) {
-        await Promise.all(
-          cTokenAddresses.map(async (cTokenAddress) => {
-            const cTokenInstance = createCToken(fuse, cTokenAddress);
-            _map[cTokenAddress] = await cTokenInstance.callStatic.underlying();
-          })
-        );
-      }
-
-      return _map;
-    }
-  );
-
-  return cTokensUnderlying ?? {};
-};

@@ -1,36 +1,18 @@
-import {
-  Box,
-  Divider,
-  SimpleGrid as Grid,
-  Skeleton,
-  Stack,
-  Text,
-  TextProps,
-} from '@chakra-ui/react';
-import { memo, useMemo, useState } from 'react';
+import { Box, SimpleGrid as Grid, Skeleton, Stack, Text, TextProps } from '@chakra-ui/react';
+import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { FuseDashNav } from '@components/pages/Fuse/FuseDashNav';
 import FusePageLayout from '@components/pages/Fuse/FusePageLayout';
-import PoolCard from '@components/pages/Fuse/FusePoolCard';
 import PoolRow from '@components/pages/Fuse/FusePoolRow';
-import FuseStatsBar from '@components/pages/Fuse/FuseStatsBar';
 import PageTransitionLayout from '@components/shared/PageTransitionLayout';
-import { useRari } from '@context/RariContext';
 import { MergedPool, useFusePools } from '@hooks/fuse/useFusePools';
 import { useColors } from '@hooks/useColors';
-import { useFilter } from '@hooks/useFilter';
-import { useIsSmallScreen } from '@hooks/useIsSmallScreen';
-import { useSort } from '@hooks/useSort';
 import { Column, Row } from '@utils/chakraUtils';
 
 const FusePoolsPage = memo(() => {
   return (
     <PageTransitionLayout>
       <FusePageLayout>
-        <FuseStatsBar />
-        <Divider />
-        <FuseDashNav />
         <PoolList />
       </FusePageLayout>
     </PageTransitionLayout>
@@ -39,41 +21,8 @@ const FusePoolsPage = memo(() => {
 
 export default FusePoolsPage;
 
-const usePoolSorting = (pools: MergedPool[], sortBy: string | null): MergedPool[] => {
-  return useMemo(() => {
-    pools?.sort((a: MergedPool, b: MergedPool) => {
-      if (!sortBy || sortBy.toLowerCase() === 'supply') {
-        if (b.suppliedUSD > a.suppliedUSD) {
-          return 1;
-        }
-
-        if (b.suppliedUSD < a.suppliedUSD) {
-          return -1;
-        }
-      } else {
-        if (b.borrowedUSD > a.borrowedUSD) {
-          return 1;
-        }
-
-        if (b.borrowedUSD < a.borrowedUSD) {
-          return -1;
-        }
-      }
-      return b.id > a.id ? 1 : -1;
-    });
-
-    return pools.map((pool: MergedPool) => pool);
-  }, [pools, sortBy]);
-};
-
 const PoolList = () => {
-  const filter = useFilter();
-  const sortBy = useSort();
-  const isMobile = useIsSmallScreen();
-  const { isLoading, filteredPools: filteredPoolsList } = useFusePools(filter);
-  const filteredPools = usePoolSorting(filteredPoolsList, sortBy);
-  const sortedBySupplyPools = usePoolSorting(filteredPoolsList, 'supply');
-  const mostSuppliedPool = sortedBySupplyPools && sortedBySupplyPools[0];
+  const { isLoading, filteredPools } = useFusePools();
 
   const [currentPage, setCurrentPage] = useState(1);
   const poolsPerPage = 6;
@@ -83,110 +32,56 @@ const PoolList = () => {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
   const { t } = useTranslation();
-  const { viewMode } = useRari();
-  const { cPage } = useColors();
 
   return (
     <>
-      {(viewMode === 'card' || isMobile) &&
-        (!isLoading ? (
+      <Text mt={12} fontWeight="bold" textAlign="center" fontSize={40}>
+        {t('Pools list')}
+      </Text>
+      <Grid mt={8} w={'100%'} mx="auto" gap={4}>
+        <Row crossAxisAlignment="center" mainAxisAlignment="flex-start">
+          <Column mainAxisAlignment="center" crossAxisAlignment="center" width="30%">
+            <Text fontWeight="bold" textAlign="center">
+              {t('Pool Name')}
+            </Text>
+          </Column>
+          <Column mainAxisAlignment="center" crossAxisAlignment="center" width="25%">
+            <Text fontWeight="bold" textAlign="center">
+              {t('Assets')}
+            </Text>
+          </Column>
+          <Column mainAxisAlignment="center" crossAxisAlignment="center" width="15%">
+            <Text fontWeight="bold" textAlign="center">
+              {t('Total Supplied')}
+            </Text>
+          </Column>
+          <Column mainAxisAlignment="center" crossAxisAlignment="center" width="18%">
+            <Text fontWeight="bold" textAlign="center">
+              {t('Total Borrowed')}
+            </Text>
+          </Column>
+          <Column mainAxisAlignment="center" crossAxisAlignment="center" width="10%"></Column>
+        </Row>
+        {!isLoading ? (
           currentPools.length ? (
-            <Grid
-              templateRows={{
-                base: 'repeat(1, minmax(0, 1fr))',
-                lg: 'repeat(2, minmax(0, 1fr))',
-              }}
-              autoFlow="row"
-              columns={{ base: 1, md: 2, lg: 2, xl: 3 }}
-              my={8}
-              w={'100%'}
-              mx="auto"
-              gridGap="8"
-              gridRowGap="8"
-            >
+            <>
               {currentPools.map((pool: MergedPool, index: number) => {
-                return <PoolCard data={pool} key={index} />;
+                return <PoolRow data={pool} key={index} />;
               })}
-            </Grid>
+            </>
           ) : (
-            <Text width="100%" textAlign="center" fontWeight="bold" fontSize={24} mt={12}>
+            <Text width="100%" textAlign="center" fontWeight="bold" fontSize={24} my={24}>
               No pools found
             </Text>
           )
         ) : (
-          <Stack direction={['column', 'row']} width="100%" mx="auto" mt={12} spacing={8}>
-            <Skeleton width="50%" height="400px" />
-            <Skeleton width="50%" height="400px" />
-            {!isMobile && <Skeleton width="50%" height="400px" />}
+          <Stack width="100%" mx="auto" mt={2}>
+            <Skeleton height="80px" borderRadius={12} />
+            <Skeleton height="80px" borderRadius={12} />
+            <Skeleton height="80px" borderRadius={12} />
           </Stack>
-        ))}
-      {viewMode === 'list' && !isMobile && (
-        <Grid mt={8} w={'100%'} mx="auto" gap={4}>
-          <Row crossAxisAlignment="center" mainAxisAlignment="flex-start">
-            <Column mainAxisAlignment="center" crossAxisAlignment="center" width="30%">
-              <Text fontWeight="bold" textAlign="center">
-                {t('The Most Supplied Pool Name')}
-              </Text>
-            </Column>
-            <Column mainAxisAlignment="center" crossAxisAlignment="center" width="15%">
-              <Text fontWeight="bold" textAlign="center">
-                {t('Risk Score')}
-              </Text>
-            </Column>
-            <Column mainAxisAlignment="center" crossAxisAlignment="center" width="20%">
-              <Text fontWeight="bold" textAlign="center">
-                {t('Assets')}
-              </Text>
-            </Column>
-            <Column mainAxisAlignment="center" crossAxisAlignment="center" width="10%">
-              <Text fontWeight="bold" textAlign="center">
-                {t('Total Supplied')}
-              </Text>
-            </Column>
-            <Column mainAxisAlignment="center" crossAxisAlignment="center" width="13%">
-              <Text fontWeight="bold" textAlign="center">
-                {t('Total Borrowed')}
-              </Text>
-            </Column>
-            <Column mainAxisAlignment="center" crossAxisAlignment="center" width="10%"></Column>
-          </Row>
-          {!isLoading ? (
-            currentPools.length ? (
-              <>
-                {mostSuppliedPool && (
-                  <>
-                    <PoolRow data={mostSuppliedPool} isMostSupplied />
-                    <Divider
-                      width={'100%'}
-                      height={4}
-                      mb={4}
-                      borderBottomWidth={2}
-                      borderStyle="dashed"
-                      opacity="1"
-                      borderColor={cPage.primary.borderColor}
-                    />
-                  </>
-                )}
-                {currentPools.map((pool: MergedPool, index: number) => {
-                  if (mostSuppliedPool.id !== pool.id) {
-                    return <PoolRow data={pool} key={index} />;
-                  }
-                })}
-              </>
-            ) : (
-              <Text width="100%" textAlign="center" fontWeight="bold" fontSize={24} my={24}>
-                No pools found
-              </Text>
-            )
-          ) : (
-            <Stack width="100%" mx="auto" mt={2}>
-              <Skeleton height="80px" borderRadius={12} />
-              <Skeleton height="80px" borderRadius={12} />
-              <Skeleton height="80px" borderRadius={12} />
-            </Stack>
-          )}
-        </Grid>
-      )}
+        )}
+      </Grid>
       <Box w="100%" mx="auto" mb="10" mt={10} textAlign="center">
         <Pagination
           currentPage={currentPage}

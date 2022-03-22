@@ -33,7 +33,10 @@ export const fetchTokenData = async (
   if (chainId) {
     if (address !== NATIVE_TOKEN_DATA[chainId].address) {
       try {
-        const tokenData = await axios.get(`/api/tokenData?address=${address}&chain=${chainId}`);
+        const tokenData = await axios.post('/api/tokenData', {
+          address: address,
+          chain: chainId,
+        });
 
         data = {
           ...tokenData.data,

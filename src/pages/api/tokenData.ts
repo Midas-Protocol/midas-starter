@@ -47,9 +47,9 @@ const handler = async (request: NextApiRequest, response: NextApiResponse<TokenD
   response.setHeader('Access-Control-Allow-Origin', '*');
   response.setHeader('Cache-Control', 'max-age=3600, s-maxage=3600');
 
-  await querySchema.validate(request.query);
-  const { chain } = request.query;
-  const address = utils.getAddress(request.query.address as string);
+  const { chain } = request.body;
+  await querySchema.validate(request.body);
+  const address = utils.getAddress(request.body.address as string);
   const tokenContract = new Contract(
     address,
     ERC20ABI,
@@ -103,8 +103,7 @@ const handler = async (request: NextApiRequest, response: NextApiResponse<TokenD
       ...basicTokenInfo,
       color: '#FFFFFF',
       overlayTextColor: '#000',
-      logoURL:
-        'https://raw.githubusercontent.com/feathericons/feather/master/icons/help-circle.svg',
+      logoURL: '',
       address,
     });
 
