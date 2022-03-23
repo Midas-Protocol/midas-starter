@@ -11,7 +11,7 @@ const mainnet: ChainMetadata = {
   enabled: true,
   supported: true,
   blocksPerMin: 20,
-  blockExplorerUrls: ['https://bscscan.com'],
+  blockExplorerUrls: [{ name: 'BscScan', url: 'https://bscscan.com' }],
   rpcUrls: ['https://bsc-dataseed.binance.org/'],
   nativeCurrency: {
     symbol: 'BNB',
@@ -35,7 +35,7 @@ const testnet: ChainMetadata = {
   enabled: true,
   supported: process.env.NODE_ENV === 'development' || !!process.env.NEXT_PUBLIC_SHOW_TESTNETS,
   blocksPerMin: 20,
-  blockExplorerUrls: ['https://testnet.bscscan.com'],
+  blockExplorerUrls: [{ name: 'BscScan(Testnet)', url: 'https://testnet.bscscan.com' }],
   nativeCurrency: {
     symbol: 'TBNB',
     address: '0x0000000000000000000000000000000000000000',
