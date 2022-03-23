@@ -2,15 +2,12 @@
 import { ExternalLinkIcon } from '@chakra-ui/icons';
 import { Button, Link as ChakraLink, useToast } from '@chakra-ui/react';
 import { Web3Provider } from '@ethersproject/providers';
-import { Fuse, SupportedChains } from '@midas-capital/sdk';
-import LogRocket from 'logrocket';
+import { Fuse } from '@midas-capital/sdk';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 import {
   createContext,
   Dispatch,
   ReactNode,
-  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -18,77 +15,16 @@ import {
   useState,
 } from 'react';
 import { useQueryClient } from 'react-query';
+import { useAccount, useConnect, useNetwork, useSigner } from 'wagmi';
 
-import {
-  createAddEthereumChainParams,
-  getChainMetadata,
-  getScanUrlByChainId,
-  getSupportedChains,
-  isSupportedChainId,
-} from '@constants/networkData';
+import { getScanUrlByChainId } from '@constants/networkData';
 import { useColors } from '@hooks/useColors';
 import { handleGenericError } from '@utils/errorHandling';
-import { initFuseWithProviders, providerURLForChain } from '@utils/web3Providers';
-
-async function launchModalLazy(
-  t: (text: string, extra?: any) => string,
-  cacheProvider = true,
-  cCard: any
-) {
-  const [WalletConnectProvider, Web3Modal] = await Promise.all([
-    import('@walletconnect/web3-provider'),
-    import('web3modal'),
-  ]);
-
-  const providerOptions = {
-    injected: {
-      display: {
-        description: t('Connect with a browser extension'),
-      },
-      package: null,
-    },
-    walletconnect: {
-      package: WalletConnectProvider.default,
-      options: {
-        rpc: {
-          [SupportedChains.chapel]: providerURLForChain(SupportedChains.chapel),
-        },
-      },
-      display: {
-        description: t('Scan with a wallet to connect'),
-      },
-    },
-  };
-
-  if (!cacheProvider) {
-    localStorage.removeItem('WEB3_CONNECT_CACHED_PROVIDER');
-  }
-
-  const web3Modal = new Web3Modal.default({
-    cacheProvider,
-    providerOptions,
-    theme: {
-      background: cCard.bgColor,
-      main: cCard.txtColor,
-      secondary: cCard.txtColor,
-      border: cCard.borderColor,
-      hover: cCard.hoverBgColor,
-    },
-  });
-
-  return web3Modal.connect();
-}
+import { initFuseWithProviders } from '@utils/web3Providers';
 
 export interface RariContextData {
-  fuse: Fuse;
-  web3ModalProvider: any | null;
   isAuthed: boolean;
-  login: (cacheProvider?: boolean) => Promise<any>;
-  logout: () => any;
-  address: string;
-  isAttemptingLogin: boolean;
-  chainId: number | undefined;
-  switchNetwork: (newChainId: number) => void;
+  fuse: Fuse;
   scanUrl: string | null;
   loading: boolean;
   setLoading: Dispatch<boolean>;
@@ -96,6 +32,15 @@ export interface RariContextData {
   setPendingTxHashes: Dispatch<string[]>;
   pendingTxHash: string;
   setPendingTxHash: Dispatch<string>;
+  connectError: Error | undefined;
+  connectData: any;
+  connect: (connector: any) => Promise<any>;
+  disconnect: () => void;
+  address: string;
+  accountData: any;
+  networkData: any;
+  switchNetwork: ((chainId: number) => Promise<any>) | undefined;
+  accountBtnElement: any;
 }
 
 export const EmptyAddress = '0x0000000000000000000000000000000000000000';
@@ -103,37 +48,33 @@ export const EmptyAddress = '0x0000000000000000000000000000000000000000';
 export const RariContext = createContext<RariContextData | undefined>(undefined);
 
 export const RariProvider = ({ children }: { children: ReactNode }) => {
-  const router = useRouter();
+  const [{ data: networkData }, switchNetwork] = useNetwork();
+  const [{ data: accountData }, disconnect] = useAccount({
+    fetchEns: true,
+  });
+  const [{ data: connectData, error: connectError }, connect] = useConnect();
+
+  const [{ data: signerData }] = useSigner();
 
   // Rari and Fuse get initially set already
   const [fuse, setFuse] = useState<Fuse>(() => initFuseWithProviders());
-
-  const [isAttemptingLogin, setIsAttemptingLogin] = useState<boolean>(false);
-
   const [address, setAddress] = useState<string>(EmptyAddress);
-
-  const [web3ModalProvider, setWeb3ModalProvider] = useState<any | null>(null);
-
   const [chainId, setChainId] = useState<number | undefined>();
-
   const [scanUrl, setScanUrl] = useState<string | null>(null);
-
-  const [viewMode, setViewMode] = useState<string>('');
-
   const [loading, setLoading] = useState<boolean>(false);
-
   const [pendingTxHashes, setPendingTxHashes] = useState<string[]>([]);
-
   const [pendingTxHash, setPendingTxHash] = useState<string>('');
-
   const [finishedTxHash, setFinishedTxHash] = useState<string>('');
+
+  const accountBtnElement = useRef();
 
   const toast = useToast();
   const queryClient = useQueryClient();
   const { t } = useTranslation();
-  const { cCard, cPage } = useColors();
+  const { cPage } = useColors();
 
   const mounted = useRef(false);
+
   useEffect(() => {
     const pendingStr = localStorage.getItem('pendingTxHashes');
     const pending = pendingStr !== null ? JSON.parse(pendingStr) : [];
@@ -148,6 +89,44 @@ export const RariProvider = ({ children }: { children: ReactNode }) => {
       mounted.current = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (accountData) {
+      setAddress(accountData.address);
+    }
+  }, [accountData]);
+
+  useEffect(() => {
+    if (signerData && signerData.provider) {
+      const fuseInstance = initFuseWithProviders(signerData.provider as Web3Provider, chainId);
+      mounted.current && setFuse(fuseInstance);
+    }
+  }, [signerData]);
+
+  useEffect(() => {
+    if (networkData && networkData.chain) {
+      setChainId(networkData.chain.id);
+      setScanUrl(getScanUrlByChainId(networkData.chain.id));
+      const id = 'unsupported-network';
+      if (networkData.chain?.unsupported) {
+        if (!toast.isActive(id)) {
+          toast({
+            id,
+            title: 'Unsupported Network!',
+            description: `Supported Networks: ${networkData.chains
+              .map((chain) => chain.name)
+              .join(', ')}`,
+            status: 'warning',
+            position: 'bottom-right',
+            duration: 5000,
+            isClosable: true,
+          });
+        }
+      } else {
+        toast.close(id);
+      }
+    }
+  }, [networkData, toast]);
 
   useEffect(() => {
     localStorage.setItem('pendingTxHashes', JSON.stringify(pendingTxHashes));
@@ -217,151 +196,17 @@ export const RariProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [finishedTxHash]);
 
-  useEffect(() => {
-    mounted.current &&
-      Promise.all([fuse.provider.send('net_version', []), fuse.provider.getNetwork()]).then(
-        ([, network]) => {
-          const { chainId } = network;
-
-          mounted.current && setChainId(chainId);
-          mounted.current && setScanUrl(getScanUrlByChainId(chainId));
-
-          if (!isSupportedChainId(chainId) && !toast.isActive('unsupported-network')) {
-            toast({
-              id: 'unsupported-network',
-              title: 'Unsupported Network!',
-              description: `Supported Networks: ${getSupportedChains()
-                .map((chain) => chain.shortName)
-                .join(', ')}`,
-              status: 'warning',
-              position: 'bottom-right',
-              duration: null,
-              isClosable: true,
-            });
-          } else if (isSupportedChainId(chainId) && toast.isActive('unsupported-network')) {
-            toast.close('unsupported-network');
-          }
-        }
-      );
-  }, [fuse, toast]);
-
-  // We need to give rari the new provider (todo: and also ethers.js signer) every time someone logs in again
-  const setRariAndAddressFromModal = useCallback(
-    async (modalProvider) => {
-      const provider = new Web3Provider(modalProvider);
-      const { chainId } = await provider.getNetwork();
-
-      const fuseInstance = initFuseWithProviders(provider, chainId);
-
-      mounted.current && setFuse(fuseInstance);
-
-      fuseInstance.provider.listAccounts().then((addresses: string[]) => {
-        if (addresses.length === 0) {
-          router.reload();
-        }
-
-        const address = addresses[0];
-        const requestedAddress = router.query.address as string;
-
-        LogRocket.identify(address);
-        mounted.current && setAddress(requestedAddress ?? address);
-      });
-    },
-    [setAddress, router]
-  );
-
-  const login = useCallback(
-    async (cacheProvider = true) => {
-      try {
-        mounted.current && setIsAttemptingLogin(true);
-        const providerWeb3Modal = await launchModalLazy(t, cacheProvider, cCard);
-        mounted.current && setWeb3ModalProvider(providerWeb3Modal);
-        mounted.current && setRariAndAddressFromModal(providerWeb3Modal);
-        mounted.current && setIsAttemptingLogin(false);
-      } catch (err) {
-        mounted.current && setIsAttemptingLogin(false);
-        return console.error(err);
-      }
-    },
-    [setWeb3ModalProvider, setRariAndAddressFromModal, setIsAttemptingLogin, t, cCard]
-  );
-
-  const refetchAccountData = useCallback(() => {
-    mounted.current && web3ModalProvider !== null && setRariAndAddressFromModal(web3ModalProvider);
-
-    queryClient.clear();
-  }, [setRariAndAddressFromModal, web3ModalProvider, queryClient]);
-
-  const logout = useCallback(() => {
-    mounted.current &&
-      setWeb3ModalProvider((past: any) => {
-        if (past?.off) {
-          past.off('accountsChanged', refetchAccountData);
-          past.off('chainChanged', refetchAccountData);
-        }
-
-        return null;
-      });
-
-    localStorage.removeItem('WEB3_CONNECT_CACHED_PROVIDER');
-
-    mounted.current && setAddress(EmptyAddress);
-  }, [setWeb3ModalProvider, refetchAccountData]);
-
-  useEffect(() => {
-    if (web3ModalProvider !== null && web3ModalProvider.on) {
-      web3ModalProvider.on('accountsChanged', refetchAccountData);
-      web3ModalProvider.on('chainChanged', refetchAccountData);
-    }
-
-    return () => {
-      if (web3ModalProvider?.off) {
-        web3ModalProvider.off('accountsChanged', refetchAccountData);
-        web3ModalProvider.off('chainChanged', refetchAccountData);
-      }
-    };
-  }, [web3ModalProvider, refetchAccountData]);
-
-  // Based on Metamask-recommended code at
-  // https://docs.metamask.io/guide/rpc-api.html#usage-with-wallet-switchethereumchain
-  // TODO(nathanhleung) handle all possible errors
-
   const value = useMemo(() => {
-    const switchNetwork = async function (chainId: SupportedChains) {
-      const hexChainId = chainId.toString(16);
-      const chainMetadata = getChainMetadata(chainId);
-
-      try {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: `0x${hexChainId}` }],
-        });
-      } catch (switchError) {
-        // This error code indicates that the chain has not been added to MetaMask.
-        if ((switchError as any).code === 4902) {
-          try {
-            await window.ethereum.request({
-              method: 'wallet_addEthereumChain',
-              params: chainMetadata ? [createAddEthereumChainParams(chainMetadata)] : undefined,
-            });
-          } catch (addError) {
-            // handle "add" error
-          }
-        }
-        // handle other "switch" errors
-      } finally {
-        refetchAccountData();
-      }
-    };
-
     return {
-      web3ModalProvider,
+      isAuthed: connectData.connected,
+      connectData,
+      connectError,
+      connect,
+      disconnect,
+      accountData,
+      networkData,
       fuse,
-      isAuthed: address !== EmptyAddress,
-      login,
-      logout,
       address,
-      isAttemptingLogin,
       chainId,
       switchNetwork,
       scanUrl,
@@ -371,16 +216,19 @@ export const RariProvider = ({ children }: { children: ReactNode }) => {
       setPendingTxHash,
       pendingTxHashes,
       setPendingTxHashes,
+      accountBtnElement,
     };
   }, [
-    web3ModalProvider,
-    login,
-    logout,
-    address,
+    connectData,
+    connectError,
+    connect,
+    disconnect,
+    accountData,
+    networkData,
     fuse,
-    isAttemptingLogin,
+    address,
     chainId,
-    refetchAccountData,
+    switchNetwork,
     scanUrl,
     loading,
     setLoading,
@@ -388,6 +236,7 @@ export const RariProvider = ({ children }: { children: ReactNode }) => {
     setPendingTxHash,
     pendingTxHashes,
     setPendingTxHashes,
+    accountBtnElement,
   ]);
 
   return <RariContext.Provider value={value}>{children}</RariContext.Provider>;

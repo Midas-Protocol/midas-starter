@@ -3,6 +3,10 @@ import { SupportedChains } from '@midas-capital/sdk';
 import BSC from '@constants/networkData/BSC';
 import Ganache from '@constants/networkData/Ganache';
 
+type BlockExplorerUrl = {
+  name: string;
+  url: string;
+};
 export interface ChainMetadata {
   chainId: number;
   chainIdHex: string;
@@ -15,7 +19,7 @@ export interface ChainMetadata {
   supported: boolean;
   blocksPerMin: number;
   rpcUrls: Array<string>;
-  blockExplorerUrls: Array<string>;
+  blockExplorerUrls: Array<BlockExplorerUrl>;
   nativeCurrency: {
     symbol: string;
     address: string;
@@ -68,7 +72,9 @@ export function getScanUrlByChainId(chainId: number | SupportedChains): string |
     (chainMetadata) => chainMetadata.chainId === chainId
   );
 
-  return chain.length !== 0 && chain[0].blockExplorerUrls ? chain[0].blockExplorerUrls[0] : null;
+  return chain.length !== 0 && chain[0].blockExplorerUrls
+    ? chain[0].blockExplorerUrls[0].url
+    : null;
 }
 
 export function getBlockTimePerMinuteByChainId(chainId: number): number {
@@ -78,21 +84,9 @@ export function getBlockTimePerMinuteByChainId(chainId: number): number {
   return chain[0].blocksPerMin ? chain[0].blocksPerMin : 4;
 }
 
-export interface AddChainMetadata {
-  chainId: string;
-  chainName: string;
-  rpcUrls: Array<string>;
-  blockExplorerUrls: Array<string> | null;
-  nativeCurrency: {
-    name: string;
-    symbol: string;
-    decimals: number;
-  };
-}
-
 interface AddEthereumChainParameter {
   chainId: string;
-  blockExplorerUrls?: string[];
+  blockExplorerUrls?: Array<BlockExplorerUrl>;
   chainName: string;
   iconUrls?: string[];
   nativeCurrency?: {

@@ -12,7 +12,7 @@ const mainnet: ChainMetadata = {
   supported: process.env.NODE_ENV === 'development',
   blocksPerMin: 4,
   rpcUrls: ['http://localhost:8545'],
-  blockExplorerUrls: ['http://localhost:3000'],
+  blockExplorerUrls: [{ name: 'Etherscan', url: 'http://localhost:3000' }],
   nativeCurrency: {
     symbol: 'ETH',
     address: '0x0000000000000000000000000000000000000000',
