@@ -24,6 +24,7 @@ import { initFuseWithProviders } from '@utils/web3Providers';
 
 export interface RariContextData {
   isAuthed: boolean;
+  isUnsupported: boolean | undefined;
   fuse: Fuse;
   scanUrl: string | null;
   loading: boolean;
@@ -41,6 +42,7 @@ export interface RariContextData {
   networkData: any;
   switchNetwork: ((chainId: number) => Promise<any>) | undefined;
   accountBtnElement: any;
+  networkBtnElement: any;
 }
 
 export const EmptyAddress = '0x0000000000000000000000000000000000000000';
@@ -53,6 +55,9 @@ export const RariProvider = ({ children }: { children: ReactNode }) => {
     fetchEns: true,
   });
   const [{ data: connectData, error: connectError }, connect] = useConnect();
+
+  console.log(connectData);
+  console.log(networkData);
 
   const [{ data: signerData }] = useSigner();
 
@@ -67,6 +72,7 @@ export const RariProvider = ({ children }: { children: ReactNode }) => {
   const [finishedTxHash, setFinishedTxHash] = useState<string>('');
 
   const accountBtnElement = useRef();
+  const networkBtnElement = useRef();
 
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -199,6 +205,7 @@ export const RariProvider = ({ children }: { children: ReactNode }) => {
   const value = useMemo(() => {
     return {
       isAuthed: connectData.connected,
+      isUnsupported: networkData.chain?.unsupported,
       connectData,
       connectError,
       connect,
@@ -217,6 +224,7 @@ export const RariProvider = ({ children }: { children: ReactNode }) => {
       pendingTxHashes,
       setPendingTxHashes,
       accountBtnElement,
+      networkBtnElement,
     };
   }, [
     connectData,
@@ -237,6 +245,7 @@ export const RariProvider = ({ children }: { children: ReactNode }) => {
     pendingTxHashes,
     setPendingTxHashes,
     accountBtnElement,
+    networkBtnElement,
   ]);
 
   return <RariContext.Provider value={value}>{children}</RariContext.Provider>;

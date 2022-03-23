@@ -1,11 +1,15 @@
 import { useRari } from '@context/RariContext';
 
 export const useAuthedCallback = (callback: () => any) => {
-  const { isAuthed, accountBtnElement } = useRari();
+  const { isAuthed, accountBtnElement, isUnsupported, networkBtnElement } = useRari();
 
   return () => {
     if (isAuthed) {
-      return callback();
+      if (isUnsupported) {
+        return networkBtnElement.current.click();
+      } else {
+        return callback();
+      }
     } else {
       return accountBtnElement.current.click();
     }

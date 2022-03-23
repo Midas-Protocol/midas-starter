@@ -13,7 +13,7 @@ const SwitchNetworkButton: React.FC = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const isMobile = useIsSmallScreen();
-  const { networkData } = useRari();
+  const { networkData, networkBtnElement } = useRari();
 
   const { cSolidBtn } = useColors();
 
@@ -22,6 +22,8 @@ const SwitchNetworkButton: React.FC = () => {
       setChainMetadata(getChainMetadata(networkData.chain.id));
     }
   }, [networkData]);
+
+  console.log(networkData);
 
   return (
     <Button
@@ -39,24 +41,27 @@ const SwitchNetworkButton: React.FC = () => {
       fontSize={15}
       tabIndex={0}
       fontWeight="bold"
+      ref={networkBtnElement}
     >
       <Center>
         {networkData.chain
-          ? chainMetadata && (
-              <>
-                {chainMetadata.img && (
-                  <Img
-                    width="25px"
-                    height="25px"
-                    borderRadius="50%"
-                    src={chainMetadata.img}
-                    alt=""
-                  />
-                )}
-                {isMobile ? '' : <Text ml={2}>{chainMetadata.name}</Text>}
-              </>
-            )
-          : 'Loading...'}
+          ? networkData.chain.unsupported
+            ? 'Switch to supported network'
+            : chainMetadata && (
+                <>
+                  {chainMetadata.img && (
+                    <Img
+                      width="25px"
+                      height="25px"
+                      borderRadius="50%"
+                      src={chainMetadata.img}
+                      alt=""
+                    />
+                  )}
+                  {isMobile ? '' : <Text ml={2}>{chainMetadata.name}</Text>}
+                </>
+              )
+          : 'Select a network'}
         <ChevronDownIcon ml={1} />
       </Center>
       <SwitchNetworkModal isOpen={isOpen} onClose={onClose} />
