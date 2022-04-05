@@ -1,33 +1,52 @@
-import '@styles/index.css';
 import { ChakraProvider } from '@chakra-ui/react';
-import { appWithTranslation } from 'next-i18next';
+import '@styles/index.css';
 import { AppProps } from 'next/app';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
-import { Provider as WagmiProvider } from 'wagmi';
+import { Chain, defaultChains, Provider as WagmiProvider } from 'wagmi';
+import { InjectedConnector } from 'wagmi/connectors/injected';
 
-import Layout from '@components/shared/Layout';
-import { theme } from '@constants/theme';
-import { RariProvider } from '@context/RariContext';
-import { connectors } from '@utils/connectors';
+import { SDKContext, SDKProvider } from '../context/SDKContext';
 
+const bscTestnet: Chain = {
+  id: 97,
+  name: 'BSC Testnet (Chapel)',
+  rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545/'],
+  nativeCurrency: {
+    symbol: 'TBNB',
+    name: 'BSC',
+    decimals: 18,
+  },
+  testnet: true,
+};
+
+// Chains for connectors to support
+const chains = [...defaultChains, bscTestnet];
+
+// Set up connectors
+const connectors = () => {
+  return [
+    new InjectedConnector({
+      chains: chains,
+      options: { shimDisconnect: true },
+    }),
+  ];
+};
 const queryClient = new QueryClient();
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <ChakraProvider theme={theme}>
+    <ChakraProvider>
       <WagmiProvider autoConnect connectors={connectors}>
         <QueryClientProvider client={queryClient}>
           <ReactQueryDevtools initialIsOpen={false} />
-          <RariProvider>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
-          </RariProvider>
+          <SDKProvider>
+            <Component {...pageProps} />
+          </SDKProvider>
         </QueryClientProvider>
       </WagmiProvider>
     </ChakraProvider>
   );
 }
 
-export default appWithTranslation(MyApp);
+export default MyApp;
