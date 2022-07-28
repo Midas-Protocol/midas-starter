@@ -1,34 +1,29 @@
-import { Divider, VStack } from '@chakra-ui/react';
+import { Divider, Flex, Heading } from '@chakra-ui/react';
 import { NextPage } from 'next';
-import dynamic from 'next/dynamic';
 import Head from 'next/head';
 
-import { AccountDisplay } from '@components/AccountDisplay';
-import { NetworkSelect } from '@components/NetworkSelect';
-import { PoolAssets } from '@components/PoolAssets';
-
-const DynamicConnectorSelect = dynamic(() => import('@components/ConnectorSelect'), {
-  ssr: false,
-});
+import { PoolAssets } from '@components/sdk/PoolAssets';
+import PoolsList from '@components/sdk/PoolsList';
+import { useSDK } from '@context/SDKContext';
 
 const IndexPage: NextPage = () => {
+  const { currentChain } = useSDK();
+
   return (
     <>
       <Head>
         <title>Midas Starter</title>
       </Head>
-      <VStack align={'flex-start'} gap={8}>
-        <DynamicConnectorSelect />
+      <Flex width="100%" direction="column" gap={0}>
+        {currentChain && (
+          <Heading>
+            Connected to {currentChain.name} {currentChain?.unsupported && '(unsupported)'}
+          </Heading>
+        )}
+        <PoolsList />
         <Divider />
-
-        <AccountDisplay />
-        <Divider />
-
-        <NetworkSelect />
-        <Divider />
-
         <PoolAssets />
-      </VStack>
+      </Flex>
     </>
   );
 };

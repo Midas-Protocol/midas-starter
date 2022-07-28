@@ -1,27 +1,52 @@
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { Provider, Web3Provider } from '@ethersproject/providers';
 import { Fuse } from '@midas-capital/sdk';
 import { createContext, ReactNode, useContext, useMemo } from 'react';
-import { useAccount, useNetwork, useSigner } from 'wagmi';
+import { Chain } from 'wagmi';
 
-export const SDKContext = createContext<{ sdk?: Fuse; address?: string } | undefined>(undefined);
+export interface SDKContextData {
+  sdk?: Fuse;
+  address?: string;
+  disconnect: () => void;
+  currentChain?: Chain & {
+    unsupported?: boolean | undefined;
+  };
+  chains: Chain[];
+}
 
-export const SDKProvider = ({ children }: { children: ReactNode }) => {
-  const { chain } = useNetwork();
-  const { address } = useAccount();
-  const { data: signer } = useSigner();
+export const SDKContext = createContext<SDKContextData | undefined>(undefined);
 
+interface SDKProviderProps {
+  children: ReactNode;
+  currentChain: Chain & {
+    unsupported?: boolean | undefined;
+  };
+  chains: Chain[];
+  signerProvider: Provider;
+  address: string;
+  disconnect: () => void;
+}
+
+export const SDKProvider = ({
+  children,
+  currentChain,
+  chains,
+  signerProvider,
+  address,
+  disconnect,
+}: SDKProviderProps) => {
   const sdk = useMemo(() => {
-    if (chain && signer?.provider) {
-      return new Fuse(signer.provider as JsonRpcProvider, chain.id);
-    }
-  }, [chain, signer?.provider]);
+    return new Fuse(signerProvider as Web3Provider, currentChain.id);
+  }, [signerProvider, currentChain.id]);
 
   const value = useMemo(() => {
     return {
       sdk,
       address,
+      disconnect,
+      currentChain,
+      chains,
     };
-  }, [sdk, address]);
+  }, [sdk, address, disconnect, currentChain, chains]);
 
   return <SDKContext.Provider value={value}>{children}</SDKContext.Provider>;
 };

@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, Heading, useToast } from '@chakra-ui/react';
+import { Button, ButtonGroup, useToast } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import { useNetwork, useSwitchNetwork } from 'wagmi';
 
@@ -25,17 +25,16 @@ export const NetworkSelect = () => {
 
   return (
     <>
-      {chain && (
-        <Heading>
-          Connected to {chain.name} {chain?.unsupported && '(unsupported)'}
-        </Heading>
-      )}
-
       {switchNetwork && (
         <ButtonGroup>
           {chains.map((x) =>
             x.id === chain.id ? null : (
-              <Button key={x.id} onClick={() => switchNetwork(x.id)}>
+              <Button
+                key={x.id}
+                onClick={() => switchNetwork(x.id)}
+                variant="solid"
+                colorScheme="teal"
+              >
                 Switch to {x.name}
               </Button>
             )

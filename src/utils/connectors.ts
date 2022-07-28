@@ -16,6 +16,18 @@ const supportedChains: Chain[] = [
     blockExplorers: { default: { name: 'BscScan(Testnet)', url: 'https://testnet.bscscan.com' } },
     testnet: true,
   },
+  {
+    id: 56,
+    name: 'Binance Smart Chain',
+    network: 'Binance Smart Chain',
+    nativeCurrency: {
+      name: 'BSC',
+      symbol: 'BNB',
+      decimals: 18,
+    },
+    rpcUrls: { default: 'https://bsc-dataseed.binance.org/' },
+    blockExplorers: { default: { name: 'BscScan', url: 'https://bscscan.com' } },
+  },
 ];
 
 export const { chains, provider } = configureChains(supportedChains, [

@@ -6,7 +6,8 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { createClient, WagmiConfig } from 'wagmi';
 
-import { SDKProvider } from '@context/SDKContext';
+import Layout from '@components/page/Layout';
+import CheckConnection from '@components/shared/CheckConnection';
 import { connectors, provider } from '@utils/connectors';
 
 const queryClient = new QueryClient();
@@ -23,9 +24,11 @@ function MyApp({ Component, pageProps }: AppProps) {
       <WagmiConfig client={client}>
         <QueryClientProvider client={queryClient}>
           <ReactQueryDevtools initialIsOpen={false} />
-          <SDKProvider>
-            <Component {...pageProps} />
-          </SDKProvider>
+          <Layout>
+            <CheckConnection>
+              <Component {...pageProps} />
+            </CheckConnection>
+          </Layout>
         </QueryClientProvider>
       </WagmiConfig>
     </ChakraProvider>
