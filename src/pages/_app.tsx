@@ -1,50 +1,33 @@
-import { ChakraProvider } from '@chakra-ui/react';
 import '@styles/index.css';
+
+import { ChakraProvider } from '@chakra-ui/react';
 import { AppProps } from 'next/app';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
-import { Chain, defaultChains, Provider as WagmiProvider } from 'wagmi';
-import { InjectedConnector } from 'wagmi/connectors/injected';
+import { createClient, WagmiConfig } from 'wagmi';
 
-import { SDKContext, SDKProvider } from '../context/SDKContext';
+import { SDKProvider } from '@context/SDKContext';
+import { connectors, provider } from '@utils/connectors';
 
-const bscTestnet: Chain = {
-  id: 97,
-  name: 'BSC Testnet (Chapel)',
-  rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545/'],
-  nativeCurrency: {
-    symbol: 'TBNB',
-    name: 'BSC',
-    decimals: 18,
-  },
-  testnet: true,
-};
-
-// Chains for connectors to support
-const chains = [...defaultChains, bscTestnet];
-
-// Set up connectors
-const connectors = () => {
-  return [
-    new InjectedConnector({
-      chains: chains,
-      options: { shimDisconnect: true },
-    }),
-  ];
-};
 const queryClient = new QueryClient();
+
+const client = createClient({
+  autoConnect: true,
+  connectors,
+  provider,
+});
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider>
-      <WagmiProvider autoConnect connectors={connectors}>
+      <WagmiConfig client={client}>
         <QueryClientProvider client={queryClient}>
           <ReactQueryDevtools initialIsOpen={false} />
           <SDKProvider>
             <Component {...pageProps} />
           </SDKProvider>
         </QueryClientProvider>
-      </WagmiProvider>
+      </WagmiConfig>
     </ChakraProvider>
   );
 }

@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useConnect } from 'wagmi';
 
 export const ConnectorSelect = () => {
-  const [{ data, error, loading }, connect] = useConnect();
+  const { connect, connectors, error: connectError } = useConnect();
 
   const toast = useToast({
     status: 'error',
@@ -13,15 +13,19 @@ export const ConnectorSelect = () => {
   });
 
   useEffect(() => {
-    if (error) {
-      toast({ title: error.name, description: error.message });
+    if (connectError) {
+      toast({ title: connectError.name, description: connectError.message });
     }
-  }, [error, toast]);
+  }, [connectError, toast]);
 
   return (
     <ButtonGroup>
-      {data.connectors.map((connector) => (
-        <Button disabled={!connector.ready} key={connector.id} onClick={() => connect(connector)}>
+      {connectors.map((connector) => (
+        <Button
+          disabled={!connector.ready}
+          key={connector.id}
+          onClick={() => connect({ connector })}
+        >
           {connector.name}
           {!connector.ready && ' (unsupported)'}
         </Button>

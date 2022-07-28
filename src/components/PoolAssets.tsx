@@ -1,14 +1,14 @@
 import { Button, Heading, HStack, Input, Text, VStack } from '@chakra-ui/react';
-import { FusePoolData, USDPricedFuseAsset } from '@midas-capital/sdk';
+import { FusePoolData, NativePricedFuseAsset } from '@midas-capital/sdk';
 import { BigNumber } from 'ethers';
 import { useCallback, useState } from 'react';
 import { useQuery } from 'react-query';
 
-import { useSDK } from '../context/SDKContext';
+import { useSDK } from '@context/SDKContext';
 
 export const PoolAssets = () => {
   const { sdk, address } = useSDK();
-  const [poolId, setPoolId] = useState('9');
+  const [poolId, setPoolId] = useState('0');
 
   const {
     data: poolData,
@@ -21,13 +21,12 @@ export const PoolAssets = () => {
   });
 
   const supply = useCallback(
-    (poolData: FusePoolData, asset: USDPricedFuseAsset) => () => {
-      if (sdk & address) {
+    (poolData: FusePoolData, asset: NativePricedFuseAsset) => () => {
+      if (sdk && address) {
         sdk.supply(
           asset.cToken,
           asset.underlyingToken,
           poolData.comptroller,
-          false,
           true,
           BigNumber.from(0.01),
           { from: address }

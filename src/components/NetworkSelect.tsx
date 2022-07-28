@@ -1,10 +1,10 @@
 import { Button, ButtonGroup, Heading, useToast } from '@chakra-ui/react';
 import { useEffect } from 'react';
-import { useNetwork } from 'wagmi';
+import { useNetwork, useSwitchNetwork } from 'wagmi';
 
 export const NetworkSelect = () => {
-  // const [{ data, error, loading }, connect] = useConnect();
-  const [{ data, error, loading }, switchNetwork] = useNetwork();
+  const { chain, chains } = useNetwork();
+  const { error, switchNetwork } = useSwitchNetwork();
 
   const toast = useToast({
     status: 'error',
@@ -19,22 +19,22 @@ export const NetworkSelect = () => {
     }
   }, [error, toast]);
 
-  if (!data) {
+  if (!chain) {
     return null;
   }
 
   return (
     <>
-      {data.chain && (
+      {chain && (
         <Heading>
-          Connected to {data.chain.name} {data.chain?.unsupported && '(unsupported)'}
+          Connected to {chain.name} {chain?.unsupported && '(unsupported)'}
         </Heading>
       )}
 
       {switchNetwork && (
         <ButtonGroup>
-          {data.chains.map((x) =>
-            x.id === data.chain?.id ? null : (
+          {chains.map((x) =>
+            x.id === chain.id ? null : (
               <Button key={x.id} onClick={() => switchNetwork(x.id)}>
                 Switch to {x.name}
               </Button>
