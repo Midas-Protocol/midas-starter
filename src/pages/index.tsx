@@ -1,33 +1,36 @@
+import { Divider, VStack } from '@chakra-ui/react';
 import { NextPage } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import dynamic from 'next/dynamic';
 import Head from 'next/head';
-import { useEffect } from 'react';
 
-import FusePoolsPage from '@components/pages/Fuse/FusePoolsPage';
-import { useRari } from '@context/RariContext';
+import { AccountDisplay } from '@components/AccountDisplay';
+import { NetworkSelect } from '@components/NetworkSelect';
+import { PoolAssets } from '@components/PoolAssets';
 
-export async function getStaticProps({ locale }: { locale: string }) {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale)),
-    },
-  };
-}
+const DynamicConnectorSelect = dynamic(() => import('@components/ConnectorSelect'), {
+  ssr: false,
+});
 
-const FusePage: NextPage = () => {
-  const { setLoading } = useRari();
-  useEffect(() => {
-    setLoading(false);
-  }, [setLoading]);
-
+const IndexPage: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Midas Capital</title>
+        <title>Midas Starter</title>
       </Head>
-      <FusePoolsPage />
+      <VStack align={'flex-start'} gap={8}>
+        <DynamicConnectorSelect />
+        <Divider />
+
+        <AccountDisplay />
+        <Divider />
+
+        <NetworkSelect />
+        <Divider />
+
+        <PoolAssets />
+      </VStack>
     </>
   );
 };
 
-export default FusePage;
+export default IndexPage;
