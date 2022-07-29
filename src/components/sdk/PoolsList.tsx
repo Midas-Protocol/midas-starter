@@ -58,17 +58,25 @@ const PoolsList = () => {
           </h2>
           <AccordionPanel pb={4}>
             <TableContainer>
-              <Table variant="striped" colorScheme="gray">
+              <Table variant="striped" colorScheme="gray" overflowX="scroll">
                 <Thead>
                   <Tr>
                     <Th fontSize={14}>ID</Th>
                     <Th fontSize={14}>Name / Address</Th>
                     <Th fontSize={14}>Creator</Th>
                     <Th fontSize={14}>Assets / Addresses</Th>
-                    <Th fontSize={14}>Total Supplied</Th>
-                    <Th fontSize={14}>Total Borrowed</Th>
-                    <Th fontSize={14}>Your Supplied</Th>
-                    <Th fontSize={14}>Your Borrowed</Th>
+                    <Th fontSize={14}>
+                      Total<br></br>Supplied
+                    </Th>
+                    <Th fontSize={14}>
+                      Total<br></br>Borrowed
+                    </Th>
+                    <Th fontSize={14}>
+                      Your<br></br>Supplied
+                    </Th>
+                    <Th fontSize={14}>
+                      Your<br></br>Borrowed
+                    </Th>
                   </Tr>
                 </Thead>
                 <Tbody>
@@ -148,6 +156,10 @@ const PoolInfo = ({ pool }: { pool: FusePoolData }) => {
             })}
         </VStack>
       </Td>
+      <Td>{pool.totalSuppliedNative.toFixed(4)}</Td>
+      <Td>{pool.totalBorrowedNative.toFixed(4)}</Td>
+      <Td>{pool.totalSupplyBalanceNative.toFixed(4)}</Td>
+      <Td>{pool.totalBorrowBalanceNative.toFixed(4)}</Td>
     </Tr>
   );
 };

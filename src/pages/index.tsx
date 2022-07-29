@@ -2,6 +2,7 @@ import { Flex, Heading } from '@chakra-ui/react';
 import { NextPage } from 'next';
 import Head from 'next/head';
 
+import { CreatePool } from '@components/sdk/CreatePool';
 import { PoolAssets } from '@components/sdk/PoolAssets';
 import PoolsList from '@components/sdk/PoolsList';
 import { useSDK } from '@context/SDKContext';
@@ -21,6 +22,7 @@ const IndexPage: NextPage = () => {
           </Heading>
         )}
         <PoolsList />
+        <CreatePool />
         <PoolAssets />
       </Flex>
     </>
