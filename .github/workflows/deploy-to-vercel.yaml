@@ -2,7 +2,7 @@ name: Push - build and deploy App
 on:
   push:
     branches:
-      - main
+      - master
       - staging
       - development
 
@@ -10,10 +10,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: '16'
           cache: 'npm'
           cache-dependency-path: package.json
       - run: npm install
@@ -22,11 +22,11 @@ jobs:
 
   deploy-production:
     needs: [build]
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/master' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: amondnet/vercel-action@v20
+      - uses: actions/checkout@v3
+      - uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -35,15 +35,15 @@ jobs:
           scope: ${{ secrets.VERCEL_ORG_ID }}
           working-directory: ./
           vercel-args: '--prod'
-          alias-domains: app.midascapital.xyz
+          alias-domains: app.midasstarter.xyz
 
   deploy-development:
     needs: [build]
     if: ${{ github.ref == 'refs/heads/development' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: amondnet/vercel-action@v20
+      - uses: actions/checkout@v3
+      - uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -51,15 +51,15 @@ jobs:
           scope: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}}
           working-directory: ./
-          alias-domains: testnet.midascapital.xyz
+          alias-domains: dev.midasstarter.xyz
 
   deploy-staging:
     needs: [build]
     if: ${{ github.ref == 'refs/heads/staging' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: amondnet/vercel-action@v20
+      - uses: actions/checkout@v3
+      - uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -67,4 +67,4 @@ jobs:
           scope: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}}
           working-directory: ./
-          alias-domains: staging.midascapital.xyz
+          alias-domains: staging.midasstarter.xyz

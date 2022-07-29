@@ -4,10 +4,10 @@ import { createContext, ReactNode, useContext, useMemo } from 'react';
 import { Chain } from 'wagmi';
 
 export interface SDKContextData {
-  sdk?: Fuse;
-  address?: string;
+  sdk: Fuse;
+  address: string;
   disconnect: () => void;
-  currentChain?: Chain & {
+  currentChain: Chain & {
     unsupported?: boolean | undefined;
   };
   chains: Chain[];

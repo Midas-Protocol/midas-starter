@@ -1,4 +1,4 @@
-import { Divider, Flex, Heading } from '@chakra-ui/react';
+import { Flex, Heading } from '@chakra-ui/react';
 import { NextPage } from 'next';
 import Head from 'next/head';
 
@@ -16,12 +16,11 @@ const IndexPage: NextPage = () => {
       </Head>
       <Flex width="100%" direction="column" gap={0}>
         {currentChain && (
-          <Heading>
+          <Heading mb={4}>
             Connected to {currentChain.name} {currentChain?.unsupported && '(unsupported)'}
           </Heading>
         )}
         <PoolsList />
-        <Divider />
         <PoolAssets />
       </Flex>
     </>

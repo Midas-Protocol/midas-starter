@@ -20,48 +20,42 @@ import { useQuery } from 'react-query';
 import { useSDK } from '@context/SDKContext';
 
 export const PoolAssets = () => {
-  const { sdk, address } = useSDK();
+  const { sdk, address, currentChain } = useSDK();
   const [poolId, setPoolId] = useState('0');
 
-  const {
-    data: poolData,
-    error,
-    isLoading,
-  } = useQuery(['getMarkets', poolId], () => {
-    if (sdk) {
+  const { data: poolData } = useQuery(
+    ['getMarkets', poolId, currentChain.id],
+    () => {
       return sdk.fetchFusePoolData(poolId);
+    },
+    {
+      cacheTime: Infinity,
+      staleTime: Infinity,
+      enabled: !!poolId && !!currentChain.id,
     }
-  });
+  );
 
   const supply = useCallback(
     (poolData: FusePoolData, asset: NativePricedFuseAsset) => () => {
-      if (sdk && address) {
-        sdk.supply(
-          asset.cToken,
-          asset.underlyingToken,
-          poolData.comptroller,
-          true,
-          BigNumber.from(0.01),
-          { from: address }
-        );
-      }
+      sdk.supply(
+        asset.cToken,
+        asset.underlyingToken,
+        poolData.comptroller,
+        true,
+        BigNumber.from(0.01),
+        { from: address }
+      );
     },
     [sdk, address]
   );
 
-  console.log({ poolData, sdk, error, isLoading });
-
-  if (!sdk) {
-    return null;
-  }
-
   return (
     <Box width="100%">
-      <Accordion defaultIndex={[0]} allowMultiple>
+      <Accordion allowToggle>
         <AccordionItem borderWidth={1} borderColor="teal">
           <h2>
             <AccordionButton _expanded={{ bg: 'teal', color: 'white' }}>
-              <Box flex="1" textAlign="left">
+              <Box flex="1" textAlign="left" fontWeight="bold">
                 Pool Assets
               </Box>
               <AccordionIcon />
