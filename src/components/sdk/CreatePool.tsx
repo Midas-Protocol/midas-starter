@@ -59,7 +59,6 @@ export const CreatePool = () => {
   };
 
   const onOracle = (e: ChangeEvent<HTMLSelectElement>) => {
-    console.log(e.target.value);
     setOracle(e.target.value);
   };
 

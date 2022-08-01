@@ -22,25 +22,12 @@ import {
 } from '@chakra-ui/react';
 import { FusePoolData, NativePricedFuseAsset } from '@midas-capital/sdk';
 import { useEffect } from 'react';
-import { useQuery } from 'react-query';
 
-import { useSDK } from '@context/SDKContext';
+import { usePoolsData } from '@hooks/usePoolsData';
 import { shortAddress } from '@utils/shortAddress';
 
 const PoolsList = () => {
-  const { sdk, address, currentChain } = useSDK();
-  const { data: allPools } = useQuery(
-    ['allPools', address, currentChain.id],
-    async () => {
-      return await sdk.fetchPoolsManual({
-        verification: false,
-        options: {
-          from: address,
-        },
-      });
-    },
-    { cacheTime: Infinity, staleTime: Infinity, enabled: !!address && !!currentChain.id }
-  );
+  const { data: allPools } = usePoolsData();
 
   console.log(allPools);
 
