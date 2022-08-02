@@ -6,9 +6,10 @@ import { AddAsset } from '@components/sdk/AddAsset';
 import { Borrow } from '@components/sdk/Borrow';
 import { CreatePool } from '@components/sdk/CreatePool';
 import PoolsList from '@components/sdk/PoolsList';
+import { Repay } from '@components/sdk/Repay';
 import { Supply } from '@components/sdk/Supply';
-import { useSDK } from '@context/SDKContext';
 import { Withdraw } from '@components/sdk/Withdraw';
+import { useSDK } from '@context/SDKContext';
 
 const IndexPage: NextPage = () => {
   const { currentChain } = useSDK();
@@ -30,6 +31,7 @@ const IndexPage: NextPage = () => {
         <Supply />
         <Borrow />
         <Withdraw />
+        <Repay />
       </Flex>
     </>
   );
