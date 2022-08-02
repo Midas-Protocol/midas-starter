@@ -10,7 +10,6 @@ export const usePoolData = (poolId: string) => {
     ['usePoolData', poolId, address],
     async () => {
       const res = await sdk.fetchFusePoolData(poolId, address);
-      console.log(res, poolId, address);
 
       return res;
     },

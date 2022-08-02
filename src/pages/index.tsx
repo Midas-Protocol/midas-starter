@@ -4,8 +4,8 @@ import Head from 'next/head';
 
 import { AddAsset } from '@components/sdk/AddAsset';
 import { CreatePool } from '@components/sdk/CreatePool';
-import { PoolAssets } from '@components/sdk/PoolAssets';
 import PoolsList from '@components/sdk/PoolsList';
+import { Supply } from '@components/sdk/Supply';
 import { useSDK } from '@context/SDKContext';
 
 const IndexPage: NextPage = () => {
@@ -24,8 +24,8 @@ const IndexPage: NextPage = () => {
         )}
         <PoolsList />
         <CreatePool />
-        <PoolAssets />
         <AddAsset />
+        <Supply />
       </Flex>
     </>
   );
