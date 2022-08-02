@@ -3,6 +3,7 @@ import { NextPage } from 'next';
 import Head from 'next/head';
 
 import { AddAsset } from '@components/sdk/AddAsset';
+import { Borrow } from '@components/sdk/Borrow';
 import { CreatePool } from '@components/sdk/CreatePool';
 import PoolsList from '@components/sdk/PoolsList';
 import { Supply } from '@components/sdk/Supply';
@@ -26,6 +27,7 @@ const IndexPage: NextPage = () => {
         <CreatePool />
         <AddAsset />
         <Supply />
+        <Borrow />
       </Flex>
     </>
   );
