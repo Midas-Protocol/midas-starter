@@ -9,17 +9,11 @@ export const DepositAsset = () => {
   const [market, setMarket] = useState<string>();
   const [poolId, setPoolId] = useState('0');
 
-  const {
-    data: poolData,
-    error,
-    isLoading,
-  } = useQuery(['getMarkets', poolId], () => {
+  const { data: poolData } = useQuery(['getMarkets', poolId], () => {
     if (sdk) {
       return sdk.fetchFusePoolData(poolId);
     }
   });
-
-  console.log({ poolData, sdk, error, isLoading });
 
   if (!sdk) {
     return null;

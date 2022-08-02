@@ -9,6 +9,7 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  Heading,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
@@ -19,7 +20,7 @@ import {
 import { InterestRateModelConf, MarketConfig } from '@midas-capital/sdk';
 import { SupportedAsset } from '@midas-capital/sdk/dist/cjs/src/types';
 import { constants } from 'ethers';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from 'react-query';
 
 import { ADMIN_FEE, COLLATERAL_FACTOR, RESERVE_FACTOR } from '@constants/constants';
@@ -33,24 +34,33 @@ export const AddAsset = () => {
   const { sdk, address } = useSDK();
   const [assetIndex, setAssetIndex] = useState<number>(0);
   const [selectedAsset, setSelectedAsset] = useState<SupportedAsset | undefined>();
-  const [poolId, setPoolId] = useState<number>(0);
+  const [poolId, setPoolId] = useState<string>('');
   const [availableAssets, setAvailableAssets] = useState<SupportedAsset[] | []>([]);
   const [collateralFactor, setCollateralFactor] = useState<number>(COLLATERAL_FACTOR.DEFAULT);
   const [reserveFactor, setReserveFactor] = useState<number>(RESERVE_FACTOR.DEFAULT);
   const [adminFee, setAdminFee] = useState<number>(ADMIN_FEE.DEFAULT);
   const [addedAssetsAddress, setAddedAssetsAddress] = useState<string[] | undefined>();
   const [isAdding, setIsAdding] = useState<boolean>(false);
-  const [irm, setIrm] = useState<string>('');
+  const [irm, setIrm] = useState<string>(sdk.chainDeployment.JumpRateModel.address);
   const { data: allPools } = usePoolsData();
-  const { data: poolData, isLoading: isPoolDataLoading } = usePoolData(poolId.toString());
+  const { data: poolData, isLoading: isPoolDataLoading } = usePoolData(poolId);
   const errorToast = useErrorToast();
   const successToast = useSuccessToast();
   const queryClient = useQueryClient();
+  const pools = useMemo(() => {
+    return allPools?.filter((pool) => pool?.creator.toLowerCase() === address.toLowerCase());
+  }, [allPools, address]);
+
+  useEffect(() => {
+    setPoolId('');
+  }, [pools]);
 
   useEffect(() => {
     if (poolData && poolData.assets.length !== 0) {
       const addresses = poolData.assets.map((asset) => asset.underlyingToken.toLowerCase());
       setAddedAssetsAddress(addresses);
+    } else {
+      setAddedAssetsAddress(undefined);
     }
   }, [poolData]);
 
@@ -63,7 +73,7 @@ export const AddAsset = () => {
   }, [assetIndex, availableAssets]);
 
   useEffect(() => {
-    if (!isPoolDataLoading) {
+    if (poolData && !isPoolDataLoading && poolId) {
       const availableAssets = sdk.supportedAssets.filter(
         (asset) => !addedAssetsAddress?.includes(asset.underlying.toLowerCase())
       );
@@ -72,10 +82,10 @@ export const AddAsset = () => {
     } else {
       setAvailableAssets([]);
     }
-  }, [sdk.supportedAssets, addedAssetsAddress, isPoolDataLoading]);
+  }, [sdk.supportedAssets, addedAssetsAddress, isPoolDataLoading, poolData, poolId]);
 
   const onPoolChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    setPoolId(Number(e.target.value));
+    setPoolId(e.target.value);
   };
 
   const onAssetChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -168,35 +178,41 @@ export const AddAsset = () => {
           </h2>
           <AccordionPanel pb={4}>
             <Flex direction="column" gap={4}>
+              <Heading size="md">You can add an asset to a pool only you created</Heading>
               <Flex width="100%" direction="row" gap={4}>
                 <FormControl flex={1}>
                   <FormLabel>Pool ID</FormLabel>
-                  <Select onChange={onPoolChange}>
-                    {allPools &&
-                      allPools.length !== 0 &&
-                      allPools.map((pool, index) => {
+                  <Select onChange={onPoolChange} value={poolId}>
+                    <option className="white-bg-option" value="">
+                      Select Pool Id
+                    </option>
+                    {pools &&
+                      pools.length !== 0 &&
+                      pools.map((pool, index) => {
                         return (
                           <option key={index} className="white-bg-option" value={pool?.id}>
-                            {pool?.id}
+                            {pool?.id} ( {pool?.name} )
                           </option>
                         );
                       })}
                   </Select>
                 </FormControl>
-                <FormControl flex={3}>
-                  <FormLabel>Available Assets {isPoolDataLoading && '( Loading )'}</FormLabel>
-                  <Select onChange={onAssetChange}>
-                    {availableAssets.map((asset, index) => {
-                      return (
-                        <option key={index} value={index}>
-                          {asset.symbol} - {asset.name}
-                        </option>
-                      );
-                    })}
-                  </Select>
-                </FormControl>
+                {poolId && (
+                  <FormControl flex={3}>
+                    <FormLabel>Available Assets {isPoolDataLoading && '( Loading )'}</FormLabel>
+                    <Select onChange={onAssetChange}>
+                      {availableAssets.map((asset, index) => {
+                        return (
+                          <option key={index} value={index}>
+                            {asset.symbol} - {asset.name}
+                          </option>
+                        );
+                      })}
+                    </Select>
+                  </FormControl>
+                )}
               </Flex>
-              {selectedAsset && (
+              {poolId && selectedAsset && (
                 <Flex width="100%" direction="row" gap={4}>
                   <FormControl flex={2}>
                     <FormLabel>Collateral Factor</FormLabel>

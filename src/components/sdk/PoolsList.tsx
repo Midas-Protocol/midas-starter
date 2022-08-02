@@ -29,8 +29,6 @@ import { shortAddress } from '@utils/shortAddress';
 const PoolsList = () => {
   const { data: allPools } = usePoolsData();
 
-  console.log(allPools);
-
   return (
     <Box width="100%">
       <Accordion allowToggle>
