@@ -10,6 +10,7 @@ import { Repay } from '@components/sdk/Repay';
 import { SetCollateral } from '@components/sdk/SetCollateral';
 import { SetPoolName } from '@components/sdk/SetPoolName';
 import { Supply } from '@components/sdk/Supply';
+import { TransferOwnership } from '@components/sdk/TransferOwndership';
 import { Tvllocked } from '@components/sdk/Tvllocked';
 import { Withdraw } from '@components/sdk/Withdraw';
 import { useSDK } from '@context/SDKContext';
@@ -38,6 +39,7 @@ const IndexPage: NextPage = () => {
         <Repay />
         <SetCollateral />
         <SetPoolName />
+        <TransferOwnership />
       </Flex>
     </>
   );
