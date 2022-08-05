@@ -4,14 +4,21 @@ import Head from 'next/head';
 
 import { AddAsset } from '@components/sdk/AddAsset';
 import { Borrow } from '@components/sdk/Borrow';
+import { BorrowingPossibility } from '@components/sdk/BorrowingPossibility';
 import { CreatePool } from '@components/sdk/CreatePool';
 import PoolsList from '@components/sdk/PoolsList';
+import { RemovingAsset } from '@components/sdk/RemovingAsset';
 import { RenounceOwnership } from '@components/sdk/RenounceOwnership';
 import { Repay } from '@components/sdk/Repay';
+import { SetAdminFee } from '@components/sdk/SetAdminFee';
 import { SetCollateral } from '@components/sdk/SetCollateral';
+import { SetCollateralFactor } from '@components/sdk/SetCollateralFactor';
+import { SetInterestModal } from '@components/sdk/SetInterestModal';
 import { SetPoolLiquidationIncentive } from '@components/sdk/SetLiquidationIncentive';
 import { SetPoolCloseFactor } from '@components/sdk/SetPoolCloseFactor';
 import { SetPoolName } from '@components/sdk/SetPoolName';
+import { SetReserveFactor } from '@components/sdk/SetReserveFactor';
+import { SetWhitelist } from '@components/sdk/SetWhitelist';
 import { Supply } from '@components/sdk/Supply';
 import { TransferOwnership } from '@components/sdk/TransferOwndership';
 import { Tvllocked } from '@components/sdk/Tvllocked';
@@ -65,6 +72,17 @@ const IndexPage: NextPage = () => {
         <RenounceOwnership />
         <SetPoolCloseFactor />
         <SetPoolLiquidationIncentive />
+        <SetWhitelist />
+
+        <Heading size="md" mt="8" mb="4">
+          Pool Configuration
+        </Heading>
+        <BorrowingPossibility />
+        <SetCollateralFactor />
+        <SetReserveFactor />
+        <SetAdminFee />
+        <SetInterestModal />
+        <RemovingAsset />
       </Flex>
     </>
   );
