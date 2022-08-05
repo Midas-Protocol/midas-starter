@@ -73,8 +73,6 @@ export const Withdraw = () => {
           }
         );
 
-        console.log(errorCode);
-
         if (errorCode !== null) {
           fundOperationError(errorCode);
         } else {

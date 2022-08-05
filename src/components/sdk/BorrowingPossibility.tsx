@@ -75,8 +75,6 @@ export const BorrowingPossibility = () => {
     }
   };
 
-  console.log(selectedAsset);
-
   return (
     <Box width="100%">
       <Accordion allowToggle>
