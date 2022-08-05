@@ -75,7 +75,7 @@ const IndexPage: NextPage = () => {
         <SetWhitelist />
 
         <Heading size="md" mt="8" mb="4">
-          Pool Configuration
+          Asset Configuration
         </Heading>
         <BorrowingPossibility />
         <SetCollateralFactor />
