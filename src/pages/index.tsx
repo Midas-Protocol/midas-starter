@@ -2,29 +2,31 @@ import { Flex, Heading } from '@chakra-ui/react';
 import { NextPage } from 'next';
 import Head from 'next/head';
 
-import { AddAsset } from '@components/sdk/AddAsset';
-import { AddExistingFlywheel } from '@components/sdk/AddExistingFlywheel';
-import { Borrow } from '@components/sdk/Borrow';
-import { BorrowingPossibility } from '@components/sdk/BorrowingPossibility';
-import { CreatePool } from '@components/sdk/CreatePool';
-import { DeployNewFlywheel } from '@components/sdk/DeployNewFlywheel';
-import PoolsList from '@components/sdk/PoolsList';
-import { RemovingAsset } from '@components/sdk/RemovingAsset';
-import { RenounceOwnership } from '@components/sdk/RenounceOwnership';
-import { Repay } from '@components/sdk/Repay';
-import { SetAdminFee } from '@components/sdk/SetAdminFee';
-import { SetCollateral } from '@components/sdk/SetCollateral';
-import { SetCollateralFactor } from '@components/sdk/SetCollateralFactor';
-import { SetInterestModal } from '@components/sdk/SetInterestModal';
-import { SetPoolLiquidationIncentive } from '@components/sdk/SetLiquidationIncentive';
-import { SetPoolCloseFactor } from '@components/sdk/SetPoolCloseFactor';
-import { SetPoolName } from '@components/sdk/SetPoolName';
-import { SetReserveFactor } from '@components/sdk/SetReserveFactor';
-import { SetWhitelist } from '@components/sdk/SetWhitelist';
-import { Supply } from '@components/sdk/Supply';
-import { TransferOwnership } from '@components/sdk/TransferOwndership';
-import { Tvllocked } from '@components/sdk/Tvllocked';
-import { Withdraw } from '@components/sdk/Withdraw';
+import PoolsList from '@components/sdk/AllPools/PoolsList';
+import { Tvllocked } from '@components/sdk/AllPools/Tvllocked';
+import { AddAsset } from '@components/sdk/AssetAddition/AddAsset';
+import { BorrowingPossibility } from '@components/sdk/AssetConfiguration/BorrowingPossibility';
+import { RemovingAsset } from '@components/sdk/AssetConfiguration/RemovingAsset';
+import { SetAdminFee } from '@components/sdk/AssetConfiguration/SetAdminFee';
+import { SetCollateralFactor } from '@components/sdk/AssetConfiguration/SetCollateralFactor';
+import { SetInterestModal } from '@components/sdk/AssetConfiguration/SetInterestModal';
+import { SetReserveFactor } from '@components/sdk/AssetConfiguration/SetReserveFactor';
+import { AddExistingFlywheel } from '@components/sdk/Flywheels/AddExistingFlywheel';
+import { DeployNewFlywheel } from '@components/sdk/Flywheels/DeployNewFlywheel';
+import { EnableAssetForRewards } from '@components/sdk/Flywheels/EnableAssetForRewards';
+import { FundFlywheel } from '@components/sdk/Flywheels/FundFlywheel';
+import { Borrow } from '@components/sdk/FundingOperations/Borrow';
+import { Repay } from '@components/sdk/FundingOperations/Repay';
+import { SetCollateral } from '@components/sdk/FundingOperations/SetCollateral';
+import { Supply } from '@components/sdk/FundingOperations/Supply';
+import { Withdraw } from '@components/sdk/FundingOperations/Withdraw';
+import { RenounceOwnership } from '@components/sdk/PoolConfiguration/RenounceOwnership';
+import { SetPoolLiquidationIncentive } from '@components/sdk/PoolConfiguration/SetLiquidationIncentive';
+import { SetPoolCloseFactor } from '@components/sdk/PoolConfiguration/SetPoolCloseFactor';
+import { SetPoolName } from '@components/sdk/PoolConfiguration/SetPoolName';
+import { SetWhitelist } from '@components/sdk/PoolConfiguration/SetWhitelist';
+import { TransferOwnership } from '@components/sdk/PoolConfiguration/TransferOwndership';
+import { CreatePool } from '@components/sdk/PoolCreation/CreatePool';
 import { useSDK } from '@context/SDKContext';
 
 export async function getInitialProps() {
@@ -95,6 +97,8 @@ const IndexPage: NextPage = () => {
         </Heading>
         <DeployNewFlywheel />
         <AddExistingFlywheel />
+        <FundFlywheel />
+        <EnableAssetForRewards />
       </Flex>
     </>
   );
