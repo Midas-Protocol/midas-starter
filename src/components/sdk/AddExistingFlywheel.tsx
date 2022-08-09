@@ -12,9 +12,7 @@ import {
   Input,
   Select,
 } from '@chakra-ui/react';
-import { FlywheelStaticRewards } from '@midas-capital/sdk/dist/cjs/lib/contracts/typechain/FlywheelStaticRewards';
-import { FuseFlywheelCore } from '@midas-capital/sdk/dist/cjs/lib/contracts/typechain/FuseFlywheelCore';
-import { ChangeEvent, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useSDK } from '@context/SDKContext';
 import { usePoolData } from '@hooks/usePoolData';
@@ -22,12 +20,12 @@ import { usePoolsData } from '@hooks/usePoolsData';
 import { useErrorToast, useSuccessToast } from '@hooks/useToast';
 import { handleGenericError } from '@utils/errorHandling';
 
-export const DeployFlywheel = () => {
+export const AddExistingFlywheel = () => {
   const { sdk, address } = useSDK();
 
   const [rewardToken, setRewardToken] = useState<string>('');
   const [poolId, setPoolId] = useState<string>('');
-  const [isDeploying, setIsDeploying] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
 
   const { data: allPools } = usePoolsData();
   const { data: poolData } = usePoolData(poolId);
@@ -51,72 +49,23 @@ export const DeployFlywheel = () => {
     setRewardToken(e.target.value);
   };
 
-  const handleDeploy = async () => {
+  const addFlywheel = useCallback(async () => {
     if (poolData && poolId && rewardToken) {
       try {
-        setIsDeploying(true);
-        let fwCore: FuseFlywheelCore;
-
-        try {
-          fwCore = await sdk.deployFlywheelCore(rewardToken, {
-            from: address,
-          });
-          await fwCore.deployTransaction.wait();
-          successToast({
-            description: 'Flywheel Core Deployed',
-          });
-        } catch (err) {
-          throw 'Failed to deploy Flywheel Core';
-        }
-
-        let fwStaticRewards: FlywheelStaticRewards;
-        try {
-          fwStaticRewards = await sdk.deployFlywheelStaticRewards(fwCore.address, {
-            from: address,
-          });
-          await fwStaticRewards.deployTransaction.wait();
-          successToast({
-            description: 'Flywheel Rewards Deployed',
-          });
-        } catch (err) {
-          throw 'Failed to deploy Flywheel Rewards';
-        }
-
-        if (!fwStaticRewards) {
-          throw 'No Flywheel Rewards deployed';
-        }
-
-        try {
-          const tx = await sdk.setFlywheelRewards(fwCore.address, fwStaticRewards.address, {
-            from: address,
-          });
-          await tx.wait();
-          successToast({
-            description: 'Rewards Added to Flywheel',
-          });
-        } catch (e) {
-          throw 'Failed to add Rewards to Flywheel';
-        }
-
-        try {
-          const tx = await sdk.addFlywheelCoreToComptroller(fwCore.address, poolData.comptroller, {
-            from: address,
-          });
-          await tx.wait();
-          successToast({
-            description: 'Flywheel added to Pool',
-          });
-        } catch (e) {
-          throw 'Failed to add Flywheel to Pool';
-        }
-
-        setIsDeploying(false);
+        setIsAdding(true);
+        const comptroller = sdk.createComptroller(poolData.comptroller);
+        const tx = await comptroller.functions._addRewardsDistributor(rewardToken, {
+          from: address,
+        });
+        await tx.wait();
+        successToast({ description: 'Flywheel added to pool!' });
       } catch (e) {
-        setIsDeploying(false);
         handleGenericError(e, errorToast);
+      } finally {
+        setIsAdding(false);
       }
     }
-  };
+  }, [address, poolData, errorToast, rewardToken, sdk, successToast, poolId]);
 
   return (
     <Box width="100%">
@@ -125,7 +74,7 @@ export const DeployFlywheel = () => {
           <h2>
             <AccordionButton _expanded={{ bg: 'teal', color: 'white' }}>
               <Box flex="1" textAlign="left" fontWeight="bold">
-                Deploy Flywheel
+                Add Existing Flywheel
               </Box>
               <AccordionIcon />
             </AccordionButton>
@@ -152,7 +101,7 @@ export const DeployFlywheel = () => {
                 </FormControl>
                 {allPools && poolId && (
                   <FormControl flex={3}>
-                    <FormLabel>Input reward token address</FormLabel>
+                    <FormLabel>Input existing reward token address</FormLabel>
                     <Input type="text" onChange={onChangeRewardToken} value={rewardToken} />
                   </FormControl>
                 )}
@@ -162,11 +111,11 @@ export const DeployFlywheel = () => {
                 ml="auto"
                 width="100px"
                 colorScheme="teal"
-                onClick={handleDeploy}
-                isLoading={isDeploying}
-                isDisabled={isDeploying || !poolId || !rewardToken}
+                onClick={addFlywheel}
+                isLoading={isAdding}
+                isDisabled={isAdding || !poolId || !rewardToken}
               >
-                Deploy
+                Add
               </Button>
             </Flex>
           </AccordionPanel>

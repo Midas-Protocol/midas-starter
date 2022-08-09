@@ -3,10 +3,11 @@ import { NextPage } from 'next';
 import Head from 'next/head';
 
 import { AddAsset } from '@components/sdk/AddAsset';
+import { AddExistingFlywheel } from '@components/sdk/AddExistingFlywheel';
 import { Borrow } from '@components/sdk/Borrow';
 import { BorrowingPossibility } from '@components/sdk/BorrowingPossibility';
 import { CreatePool } from '@components/sdk/CreatePool';
-import { DeployFlywheel } from '@components/sdk/DeployFlywheel';
+import { DeployNewFlywheel } from '@components/sdk/DeployNewFlywheel';
 import PoolsList from '@components/sdk/PoolsList';
 import { RemovingAsset } from '@components/sdk/RemovingAsset';
 import { RenounceOwnership } from '@components/sdk/RenounceOwnership';
@@ -92,7 +93,8 @@ const IndexPage: NextPage = () => {
         <Heading size="md" mt="8" mb="4">
           Flywheels
         </Heading>
-        <DeployFlywheel />
+        <DeployNewFlywheel />
+        <AddExistingFlywheel />
       </Flex>
     </>
   );
