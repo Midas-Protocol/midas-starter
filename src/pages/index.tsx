@@ -6,6 +6,7 @@ import { AddAsset } from '@components/sdk/AddAsset';
 import { Borrow } from '@components/sdk/Borrow';
 import { BorrowingPossibility } from '@components/sdk/BorrowingPossibility';
 import { CreatePool } from '@components/sdk/CreatePool';
+import { DeployFlywheel } from '@components/sdk/DeployFlywheel';
 import PoolsList from '@components/sdk/PoolsList';
 import { RemovingAsset } from '@components/sdk/RemovingAsset';
 import { RenounceOwnership } from '@components/sdk/RenounceOwnership';
@@ -24,6 +25,10 @@ import { TransferOwnership } from '@components/sdk/TransferOwndership';
 import { Tvllocked } from '@components/sdk/Tvllocked';
 import { Withdraw } from '@components/sdk/Withdraw';
 import { useSDK } from '@context/SDKContext';
+
+export async function getInitialProps() {
+  return {};
+}
 
 const IndexPage: NextPage = () => {
   const { currentChain } = useSDK();
@@ -83,6 +88,11 @@ const IndexPage: NextPage = () => {
         <SetAdminFee />
         <SetInterestModal />
         <RemovingAsset />
+
+        <Heading size="md" mt="8" mb="4">
+          Flywheels
+        </Heading>
+        <DeployFlywheel />
       </Flex>
     </>
   );

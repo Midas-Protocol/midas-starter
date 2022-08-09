@@ -34,7 +34,7 @@ export const SetReserveFactor = () => {
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
   const { data: allPools } = usePoolsData();
   const { data: poolData, isLoading: isPoolDataLoading } = usePoolData(poolId);
-  const cTokenData = useCTokenData(poolData?.comptroller, selectedAsset?.cToken);
+  const { data: cTokenData } = useCTokenData(poolData?.comptroller, selectedAsset?.cToken);
   const errorToast = useErrorToast();
   const successToast = useSuccessToast();
   const queryClient = useQueryClient();

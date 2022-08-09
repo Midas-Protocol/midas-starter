@@ -1,3 +1,4 @@
+import { Text } from '@chakra-ui/react';
 import { ReactNode, useEffect, useState } from 'react';
 import { useAccount, useDisconnect, useNetwork, useSigner, useSwitchNetwork } from 'wagmi';
 
@@ -24,14 +25,14 @@ const CheckConnection = ({ children }: { children: ReactNode }) => {
   }, [signerData]);
 
   if (isConnecting || isReconnecting || isNetworkLoading) {
-    return <>Loading...</>;
+    return <Text>Loading...</Text>;
   }
   // Not Connected
   else if (!isConnected && !isConnecting && !isReconnecting) {
-    return <>Not Connected</>;
+    return <Text>Not Connected</Text>;
   } // Wrong Network
   else if (!chain || chain.unsupported) {
-    return <>Wrong Network</>;
+    return <Text>Wrong Network</Text>;
   }
 
   // Everything Fine

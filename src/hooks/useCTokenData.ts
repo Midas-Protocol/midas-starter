@@ -5,7 +5,7 @@ import { useSDK } from '@context/SDKContext';
 export const useCTokenData = (comptrollerAddress?: string, cTokenAddress?: string) => {
   const { sdk } = useSDK();
 
-  const { data } = useQuery(
+  return useQuery(
     ['CTokenData', cTokenAddress, comptrollerAddress],
     async () => {
       if (comptrollerAddress && cTokenAddress) {
@@ -36,6 +36,4 @@ export const useCTokenData = (comptrollerAddress?: string, cTokenAddress?: strin
     },
     { cacheTime: Infinity, staleTime: Infinity, enabled: !!cTokenAddress && !!comptrollerAddress }
   );
-
-  return data;
 };
