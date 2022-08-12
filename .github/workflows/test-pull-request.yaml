@@ -2,6 +2,10 @@ name: Pull Request - build and test App
 on:
   pull_request:
     branches: [master, staging, development]
+    paths:
+      - 'src/**'
+      - '.github/workflows/test-pull-request.yaml'
+      - 'yarn.lock'
 
 jobs:
   build:
