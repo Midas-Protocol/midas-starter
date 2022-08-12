@@ -1,10 +1,11 @@
 import { Provider, Web3Provider } from '@ethersproject/providers';
-import { Fuse } from '@midas-capital/sdk';
+import { bsc, chapel, ganache, moonbeam, neondevnet, polygon } from '@midas-capital/chains';
+import { MidasSdk } from '@midas-capital/sdk';
+import { ChainConfig } from '@midas-capital/types';
 import { createContext, ReactNode, useContext, useMemo } from 'react';
 import { Chain } from 'wagmi';
-
 export interface SDKContextData {
-  sdk: Fuse;
+  sdk: MidasSdk;
   address: string;
   disconnect: () => void;
   currentChain: Chain & {
@@ -26,6 +27,15 @@ interface SDKProviderProps {
   disconnect: () => void;
 }
 
+const chainIdToConfig: { [chainId: number]: ChainConfig } = {
+  [bsc.chainId]: bsc,
+  [polygon.chainId]: polygon,
+  [moonbeam.chainId]: moonbeam,
+  [neondevnet.chainId]: neondevnet,
+  [chapel.chainId]: chapel,
+  [ganache.chainId]: ganache,
+};
+
 export const SDKProvider = ({
   children,
   currentChain,
@@ -35,7 +45,7 @@ export const SDKProvider = ({
   disconnect,
 }: SDKProviderProps) => {
   const sdk = useMemo(() => {
-    return new Fuse(signerProvider as Web3Provider, currentChain.id);
+    return new MidasSdk(signerProvider as Web3Provider, chainIdToConfig[currentChain.id]);
   }, [signerProvider, currentChain.id]);
 
   const value = useMemo(() => {

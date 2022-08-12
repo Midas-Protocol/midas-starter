@@ -12,7 +12,7 @@ import {
   Input,
   Select,
 } from '@chakra-ui/react';
-import { ComptrollerErrorCodes, NativePricedFuseAsset } from '@midas-capital/sdk';
+import { ComptrollerErrorCodes, NativePricedFuseAsset } from '@midas-capital/types';
 import { utils } from 'ethers';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';

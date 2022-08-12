@@ -1,4 +1,4 @@
-import { ComptrollerErrorCodes } from '@midas-capital/sdk';
+import { ComptrollerErrorCodes } from '@midas-capital/types';
 
 export const handleGenericError = (e: any, errorToast: (input: any) => any) => {
   let message: string;
