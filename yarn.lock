@@ -1860,23 +1860,32 @@
     ethers "^5.6.9"
     utf-8-validate "^5.0.9"
 
-"@midas-capital/sdk@0.6.0":
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/@midas-capital/sdk/-/sdk-0.6.0.tgz#a3d1d02ba06dccef3654983bde61c77525f5e200"
-  integrity sha512-pTY4hYg7PHDILrTejDA04vTbu5LHU9rreyonSKxH5lKXa65gpKhdoyVRlBC8d+OP0lNopUdfHEIaGPS/NrT0bQ==
+"@midas-capital/sdk@0.6.2":
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/@midas-capital/sdk/-/sdk-0.6.2.tgz#e106e13e4bae67e889133b835a26b2886bc230b0"
+  integrity sha512-jAQa+qsd+YK07t7ZU/C63Z4uL634Ijd6p7F1DiqxTUV7M8oZhrdZlINLkc4lfd1gKp95S/CikNgTvmbcNiGNgQ==
   dependencies:
     "@midas-capital/chains" "workspace:*"
     "@midas-capital/types" "workspace:*"
+    "@nomiclabs/hardhat-ethers" "npm:hardhat-deploy-ethers@^0.3.0-beta.13"
     bad-words "^3.0.4"
     bufferutil "^4.0.7"
     ethereum-waffle "^4.0.10"
     ethers "^5.7.2"
     utf-8-validate "^6.0.3"
 
-"@midas-capital/types@0.3.4", "@midas-capital/types@workspace:*":
+"@midas-capital/types@0.3.4":
   version "0.3.4"
   resolved "https://registry.yarnpkg.com/@midas-capital/types/-/types-0.3.4.tgz#e4b48509b321ad16f2c2b34f7102b2ff8997d708"
   integrity sha512-H9jfGM6qMKx0dHgETm4sdei+Q6a4uLNKznle2HUgnkEGQg6yE255zFBoiUqYRvdTsciUPSCSrICf+3jIMJGS9w==
+  dependencies:
+    ethers "^5.6.9"
+    utf-8-validate "^5.0.9"
+
+"@midas-capital/types@workspace:*":
+  version "0.3.5"
+  resolved "https://registry.yarnpkg.com/@midas-capital/types/-/types-0.3.5.tgz#8ac1ba46a098c9ab962ff0499a60a2bfa9b1ab51"
+  integrity sha512-9G2zR95O/ZiRd/SFidigSViptOlNYc7m5oO39a/940bHLg8kAf8NBElXdnpomCpG1jHpmg7Jdyatji/nCQFZqw==
   dependencies:
     ethers "^5.6.9"
     utf-8-validate "^5.0.9"
@@ -1979,10 +1988,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@nomiclabs/hardhat-ethers@^2.2.3":
-  version "2.2.3"
-  resolved "https://registry.yarnpkg.com/@nomiclabs/hardhat-ethers/-/hardhat-ethers-2.2.3.tgz#b41053e360c31a32c2640c9a45ee981a7e603fe0"
-  integrity sha512-YhzPdzb612X591FOe68q+qXVXGG2ANZRvDo0RRUtimev85rCrAlv/TLMEZw5c+kq9AbzocLTVX/h2jVIFPL9Xg==
+"@nomiclabs/hardhat-ethers@npm:hardhat-deploy-ethers@^0.3.0-beta.13":
+  version "0.3.0-beta.13"
+  resolved "https://registry.yarnpkg.com/hardhat-deploy-ethers/-/hardhat-deploy-ethers-0.3.0-beta.13.tgz#b96086ff768ddf69928984d5eb0a8d78cfca9366"
+  integrity sha512-PdWVcKB9coqWV1L7JTpfXRCI91Cgwsm7KLmBcwZ8f0COSm1xtABHZTyz3fvF6p42cTnz1VM0QnfDvMFlIRkSNw==
 
 "@pedrouid/environment@^1.0.1":
   version "1.0.1"
