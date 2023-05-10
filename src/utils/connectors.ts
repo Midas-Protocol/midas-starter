@@ -12,16 +12,19 @@ const supportedChains: Chain[] = [
       symbol: 'BNB',
       decimals: 18,
     },
-    rpcUrls: { default: 'https://data-seed-prebsc-1-s1.binance.org:8545/' },
+    rpcUrls: {
+      default: { http: ['https://data-seed-prebsc-1-s1.binance.org:8545/'] },
+      public: { http: ['https://data-seed-prebsc-1-s1.binance.org:8545/'] },
+    },
     blockExplorers: { default: { name: 'BscScan(Testnet)', url: 'https://testnet.bscscan.com' } },
     testnet: true,
   },
 ];
 
-export const { chains, provider } = configureChains(supportedChains, [
+export const { chains, publicClient } = configureChains(supportedChains, [
   jsonRpcProvider({
     rpc: (chain) => {
-      return { http: chain.rpcUrls.default };
+      return { http: chain.rpcUrls.default.http[0] };
     },
   }),
 ]);
@@ -30,7 +33,7 @@ export const connectors = () => {
   return [
     new InjectedConnector({
       chains,
-      options: { shimChainChangedDisconnect: true, shimDisconnect: false },
+      options: { shimDisconnect: false },
     }),
   ];
 };

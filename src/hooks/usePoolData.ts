@@ -9,7 +9,7 @@ export const usePoolData = (poolId: string) => {
   return useQuery<FusePoolData | null>(
     ['usePoolData', poolId, address],
     async () => {
-      const res = await sdk.fetchFusePoolData(poolId, address);
+      const res = await sdk.fetchFusePoolData(poolId, { from: address });
 
       return res;
     },

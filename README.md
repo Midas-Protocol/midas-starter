@@ -16,21 +16,9 @@ First, run the development server:
 yarn dev
 ```
 
-## Connecting Metamask
-
-Also make sure to have the hardhat node running, as described in the [contracts repository](https://github.com/Midas-Protocol/contracts#dev-workflow)
-
-To connect with metamask, run the hardhat node with:
-
-```text
->>> npx hardhat node --show-accounts
-```
-
-Pick the third account (named "bob"), and use the private key shown to import a new account to MetaMask. You can
-then connect your browser to the local hardhat node by adding `localhost:8485`, `chainId 1337` to your
-MetaMask networks.
-
 ## UI
+
+UI is only available in Chapel.
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 

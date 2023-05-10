@@ -10,7 +10,7 @@ export const useCTokenData = (comptrollerAddress?: string, cTokenAddress?: strin
     async () => {
       if (comptrollerAddress && cTokenAddress) {
         const comptroller = sdk.createComptroller(comptrollerAddress);
-        const cToken = sdk.createCToken(cTokenAddress);
+        const cToken = sdk.createCTokenWithExtensions(cTokenAddress);
 
         const [
           adminFeeMantissa,

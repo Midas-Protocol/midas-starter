@@ -6,12 +6,10 @@ export const usePoolsData = () => {
   const { sdk, address, currentChain } = useSDK();
 
   return useQuery(
-    ['allPools', address, currentChain.id],
+    ['allPools', address, sdk.chainId],
     async () => {
       return await sdk.fetchPoolsManual({
-        options: {
-          from: address,
-        },
+        from: address,
       });
     },
     { cacheTime: Infinity, staleTime: Infinity, enabled: !!address && !!currentChain.id }

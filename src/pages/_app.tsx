@@ -4,24 +4,24 @@ import { ChakraProvider } from '@chakra-ui/react';
 import { AppProps } from 'next/app';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
-import { createClient, WagmiConfig } from 'wagmi';
+import { createConfig, WagmiConfig } from 'wagmi';
 
 import Layout from '@components/page/Layout';
 import CheckConnection from '@components/shared/CheckConnection';
-import { connectors, provider } from '@utils/connectors';
+import { connectors, publicClient } from '@utils/connectors';
 
 const queryClient = new QueryClient();
 
-const client = createClient({
+const config = createConfig({
   autoConnect: true,
   connectors,
-  provider,
+  publicClient,
 });
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider>
-      <WagmiConfig client={client}>
+      <WagmiConfig config={config}>
         <QueryClientProvider client={queryClient}>
           <ReactQueryDevtools initialIsOpen={false} />
           <Layout>

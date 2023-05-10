@@ -1,9 +1,10 @@
-import { Provider, Web3Provider } from '@ethersproject/providers';
+import { JsonRpcProvider } from '@ethersproject/providers';
 import { bsc, chapel, ganache, moonbeam, neondevnet, polygon } from '@midas-capital/chains';
 import { MidasSdk } from '@midas-capital/sdk';
 import { ChainConfig } from '@midas-capital/types';
 import { createContext, ReactNode, useContext, useMemo } from 'react';
 import { Chain } from 'wagmi';
+
 export interface SDKContextData {
   sdk: MidasSdk;
   address: string;
@@ -22,7 +23,6 @@ interface SDKProviderProps {
     unsupported?: boolean | undefined;
   };
   chains: Chain[];
-  signerProvider: Provider;
   address: string;
   disconnect: () => void;
 }
@@ -40,13 +40,17 @@ export const SDKProvider = ({
   children,
   currentChain,
   chains,
-  signerProvider,
   address,
   disconnect,
 }: SDKProviderProps) => {
   const sdk = useMemo(() => {
-    return new MidasSdk(signerProvider as Web3Provider, chainIdToConfig[currentChain.id]);
-  }, [signerProvider, currentChain.id]);
+    const config = chainIdToConfig[currentChain.id];
+
+    return new MidasSdk(
+      new JsonRpcProvider(config.specificParams.metadata.rpcUrls.default.http[0]),
+      config
+    );
+  }, [currentChain.id]);
 
   const value = useMemo(() => {
     return {

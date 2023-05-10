@@ -21,7 +21,6 @@
     "@midas-capital/sdk": "0.6.2",
     "@midas-capital/types": "0.3.4",
     "axios": "^1.4.0",
-    "ethers": "^5.7.0",
     "framer-motion": "^10.12.9",
     "next": "13.4.1",
     "next-i18next": "^13.2.2",
@@ -32,7 +31,8 @@
     "react-i18next": "^12.2.2",
     "react-icons": "^4.8.0",
     "react-query": "^3.39.3",
-    "wagmi": "^0.6.4"
+    "viem": "^0.3.19",
+    "wagmi": "^1.0.1"
   },
   "devDependencies": {
     "@chakra-ui/cli": "^2.4.1",

@@ -4,7 +4,6 @@ import { useSDK } from '@context/SDKContext';
 
 export interface Flywheel {
   address: string;
-  authority: string;
   booster: string;
   owner: string;
   rewards: string;
@@ -20,17 +19,14 @@ export const useFlywheelsForPool = (comptrollerAddress?: string) => {
     async () => {
       if (!comptrollerAddress) return [];
 
-      const flywheelCores = await sdk.getFlywheelsByPool(comptrollerAddress, {
-        from: await sdk.provider.getSigner().getAddress(),
-      });
+      const flywheelCores = await sdk.getFlywheelsByPool(comptrollerAddress);
 
       if (!flywheelCores.length) return [];
 
       const flywheels: Flywheel[] = await Promise.all(
         flywheelCores.map(async (flywheel) => {
           // TODO add function to FlywheelLensRouter to get all info in one call
-          const [authority, booster, rewards, markets, owner, rewardToken] = await Promise.all([
-            flywheel.callStatic.authority(),
+          const [booster, rewards, markets, owner, rewardToken] = await Promise.all([
             flywheel.callStatic.flywheelBooster(),
             flywheel.callStatic.flywheelRewards(),
             flywheel.callStatic.getAllStrategies(),
@@ -40,7 +36,6 @@ export const useFlywheelsForPool = (comptrollerAddress?: string) => {
 
           return {
             address: flywheel.address,
-            authority,
             booster,
             owner,
             rewards,
