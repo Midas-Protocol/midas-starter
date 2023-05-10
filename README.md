@@ -2,21 +2,10 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Setting up local environment
 
-Requirements: local hardhat node, up-to-date midas-sdk. For this, follow the steps 2 and 3 in
-the [contracts repository](https://github.com/Midas-Protocol/contracts#dev-workflow)
-
-If you want to run locally, you need to make sure to set SDK version as below
+Make sure you're using the latest midas-sdk in this repo, by running
 
 ```text
-.....
-@midas-capital/sdk:  "file:../contracts"
-.....
-```
-
-After that, make sure you're using the latest midas-sdk in this repo, by running
-
-```text
->>> npm install
+>>> yarn install
 ```
 
 ## Getting Started
@@ -24,8 +13,6 @@ After that, make sure you're using the latest midas-sdk in this repo, by running
 First, run the development server:
 
 ```bash
-npm run dev
-# or
 yarn dev
 ```
 
@@ -57,9 +44,7 @@ The `pages/api` directory is mapped to `/api/*`. Files in this directory are tre
 
 Coming soon
 
-
 ## **SDK Usage**
-
 
 ### **SDK Provider**
 
@@ -104,8 +89,8 @@ Refer to https://docs.midascapital.xyz/developers/midas-sdk for Midas SDK Instal
         },
       })
 
-
 #### Tvl Locked
+
     import { useSDK } from '@context/SDKContext';
     import { BigNumber, utils } from 'ethers';
 
@@ -115,13 +100,11 @@ Refer to https://docs.midascapital.xyz/developers/midas-sdk for Midas SDK Instal
     //returns TVL in ETH value
     utils.formatUnits(tvlNative)
 
-
 ### **Asset Addition**
 
 #### Add Asset To Existing Pools (That You Own)
 
     import { MarketConfig } from '@midas-capital/sdk';
-
 
 //TODO NOTE THE MARKETCONFIG TYPE IS NOT DOCUMENTED ANYWHERE ELSE
 
@@ -140,7 +123,6 @@ Refer to https://docs.midascapital.xyz/developers/midas-sdk for Midas SDK Instal
         };
     //Adds an asset to a pool both defined under marketConfig
     await sdk.deployAsset(marketConfig, { from: address });
-
 
 ### **Asset Configuration**
 
@@ -163,8 +145,8 @@ Refer to https://docs.midascapital.xyz/developers/midas-sdk for Midas SDK Instal
         );
     await tx.wait();
 
-
 #### Removing Asset
+
     import { useSDK } from '@context/SDKContext';
 
     const { sdk } = useSDK();
@@ -176,9 +158,8 @@ Refer to https://docs.midascapital.xyz/developers/midas-sdk for Midas SDK Instal
     const tx = await comptroller._unsupportMarket(cTokenAddress);
     await tx.wait();
 
-
-
 #### Set Admin Fee
+
     import { utils } from 'ethers';
     import { useSDK } from '@context/SDKContext';
     const { sdk } = useSDK();
@@ -193,6 +174,7 @@ Refer to https://docs.midascapital.xyz/developers/midas-sdk for Midas SDK Instal
     await tx.wait();
 
 #### Set Collateral Factor
+
     import { utils } from 'ethers';
     import { useSDK } from '@context/SDKContext';
     const { sdk } = useSDK();
@@ -297,7 +279,6 @@ Refer to https://docs.midascapital.xyz/developers/midas-sdk for Midas SDK Instal
     tx = await sdk.addFlywheelCoreToComptroller(fwCore.address, comptrollerAddress, { from: address });
     await tx.wait()
 
-
 #### Enable Asset For Rewards
 
     import { useSDK } from '@context/SDKContext';
@@ -384,6 +365,7 @@ Refer to https://docs.midascapital.xyz/developers/midas-sdk for Midas SDK Instal
     await tx.wait()
 
 #### Set Collateral
+
 This section Covers either Adding or Removing an Asset as Collateral
 
     import { ContractTransaction } from 'ethers';
@@ -481,7 +463,6 @@ This section Covers either Adding or Removing an Asset as Collateral
 
     //Renounces Ownership of Unitroller
     const tx: ContractTransaction = await unitroller._toggleAdminRights(false);
-
 
 #### Set Liquidation Incentive
 
@@ -591,6 +572,7 @@ This section Covers either Adding or Removing an Asset as Collateral
     await tx.wait();
 
 ### **Pool Creation**
+
 #### Create Pool
 
     import { utils } from 'ethers';
