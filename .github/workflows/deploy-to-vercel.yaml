@@ -5,6 +5,10 @@ on:
       - master
       - staging
       - development
+    paths:
+      - 'src/**'
+      - '.github/workflows/deploy-to-vercel.yaml'
+      - 'yarn.lock'
 
 jobs:
   build:
@@ -14,11 +18,11 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '16'
-          cache: 'npm'
+          cache: 'yarn'
           cache-dependency-path: package.json
-      - run: npm install
-      - run: npm run lint
-      - run: npm run build
+      - run: yarn install
+      - run: yarn lint
+      - run: yarn build
 
   deploy-production:
     needs: [build]

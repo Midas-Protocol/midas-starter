@@ -1,4 +1,4 @@
-import { FusePoolData } from '@midas-capital/sdk';
+import { FusePoolData } from '@midas-capital/types';
 import { useQuery } from 'react-query';
 
 import { useSDK } from '@context/SDKContext';

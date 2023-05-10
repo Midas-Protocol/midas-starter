@@ -20,7 +20,7 @@ import {
   useToast,
   VStack,
 } from '@chakra-ui/react';
-import { FusePoolData, NativePricedFuseAsset } from '@midas-capital/sdk';
+import { FusePoolData, NativePricedFuseAsset } from '@midas-capital/types';
 import { useEffect } from 'react';
 
 import { usePoolsData } from '@hooks/usePoolsData';

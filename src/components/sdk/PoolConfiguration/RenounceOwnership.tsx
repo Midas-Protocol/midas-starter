@@ -12,7 +12,7 @@ import {
   Heading,
   Select,
 } from '@chakra-ui/react';
-import { ComptrollerErrorCodes } from '@midas-capital/sdk';
+import { ComptrollerErrorCodes } from '@midas-capital/types';
 import { Contract, ContractTransaction } from 'ethers';
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from 'react-query';

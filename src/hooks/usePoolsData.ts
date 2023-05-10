@@ -9,7 +9,6 @@ export const usePoolsData = () => {
     ['allPools', address, currentChain.id],
     async () => {
       return await sdk.fetchPoolsManual({
-        verification: false,
         options: {
           from: address,
         },

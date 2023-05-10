@@ -17,8 +17,7 @@ import {
   NumberInputStepper,
   Select,
 } from '@chakra-ui/react';
-import { InterestRateModelConf, MarketConfig } from '@midas-capital/sdk';
-import { SupportedAsset } from '@midas-capital/sdk/dist/cjs/src/types';
+import { MarketConfig, SupportedAsset } from '@midas-capital/types';
 import { constants } from 'ethers';
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from 'react-query';
@@ -128,11 +127,6 @@ export const AddAsset = () => {
         return;
       }
 
-      // TODO do we need this?!  IRM is defined in MarketConfig, does every market needs it's own IRM?
-      const irmConfig: InterestRateModelConf = {
-        interestRateModel: irm,
-      };
-
       const marketConfig: MarketConfig = {
         underlying: selectedAsset.underlying,
         comptroller: poolData.comptroller,
@@ -148,7 +142,7 @@ export const AddAsset = () => {
       };
 
       try {
-        await sdk.deployAsset(irmConfig, marketConfig, { from: address });
+        await sdk.deployAsset(marketConfig, { from: address });
 
         await queryClient.refetchQueries();
 

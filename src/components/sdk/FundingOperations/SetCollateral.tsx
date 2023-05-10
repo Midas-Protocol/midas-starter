@@ -12,7 +12,7 @@ import {
   Select,
   Text,
 } from '@chakra-ui/react';
-import { NativePricedFuseAsset } from '@midas-capital/sdk';
+import { NativePricedFuseAsset } from '@midas-capital/types';
 import { ContractTransaction } from 'ethers';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';

@@ -11,7 +11,7 @@ import {
   FormLabel,
   Select,
 } from '@chakra-ui/react';
-import { NativePricedFuseAsset } from '@midas-capital/sdk';
+import { NativePricedFuseAsset } from '@midas-capital/types';
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 
 import { useSDK } from '@context/SDKContext';

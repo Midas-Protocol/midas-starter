@@ -1,5 +1,6 @@
-import { ComptrollerErrorCodes } from '@midas-capital/sdk';
+import { ComptrollerErrorCodes } from '@midas-capital/types';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const handleGenericError = (e: any, errorToast: (input: any) => any) => {
   let message: string;
 

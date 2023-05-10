@@ -1,4 +1,4 @@
-import { ComptrollerErrorCodes, CTokenErrorCodes } from '@midas-capital/sdk';
+import { ComptrollerErrorCodes, CTokenErrorCodes } from '@midas-capital/types';
 
 import { config } from '@config/config';
 

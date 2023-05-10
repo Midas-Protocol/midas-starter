@@ -73,8 +73,6 @@ export const CreatePool = () => {
     // 8% -> 108 * (1e18 / 100)
     const bigLiquidationIncentive = utils.parseUnits((liquidationIncentive + 100).toString(), 16);
 
-    const reporter = null;
-
     try {
       const deployResult = await sdk.deployPool(
         poolName,
@@ -82,7 +80,6 @@ export const CreatePool = () => {
         bigCloseFactor,
         bigLiquidationIncentive,
         oracle,
-        { reporter },
         { from: address },
         whitelistedAddresses
       );
