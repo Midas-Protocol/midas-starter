@@ -59,7 +59,7 @@ export const SetInterestModal = () => {
     if (poolId && poolData && selectedAsset && cTokenData) {
       try {
         setIsSetting(true);
-        const cToken = sdk.createCToken(selectedAsset.cToken);
+        const cToken = sdk.createCTokenWithExtensions(selectedAsset.cToken, sdk.signer);
         const irmAddress =
           cTokenData.interestRateModelAddress === sdk.chainDeployment.JumpRateModel.address
             ? sdk.chainDeployment.JumpRateModel.address

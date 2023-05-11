@@ -21,7 +21,7 @@ const supportedChains: Chain[] = [
   },
 ];
 
-export const { chains, publicClient } = configureChains(supportedChains, [
+export const { chains, provider } = configureChains(supportedChains, [
   jsonRpcProvider({
     rpc: (chain) => {
       return { http: chain.rpcUrls.default.http[0] };

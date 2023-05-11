@@ -53,8 +53,8 @@ export const AddExistingFlywheel = () => {
     if (poolData && poolId && rewardToken) {
       try {
         setIsAdding(true);
-        const comptroller = sdk.createComptroller(poolData.comptroller);
-        const tx = await comptroller.functions._addRewardsDistributor(rewardToken, {
+        const comptroller = sdk.createComptroller(poolData.comptroller, sdk.signer);
+        const tx = await comptroller._addRewardsDistributor(rewardToken, {
           from: address,
         });
         await tx.wait();

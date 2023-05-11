@@ -71,7 +71,7 @@ export const SetPoolLiquidationIncentive = () => {
         (Number(liquidationIncentive) / 100 + 1).toString()
       );
 
-      const comptroller = sdk.createComptroller(poolData.comptroller);
+      const comptroller = sdk.createComptroller(poolData.comptroller, sdk.signer);
 
       try {
         const response = await comptroller.callStatic._setLiquidationIncentive(

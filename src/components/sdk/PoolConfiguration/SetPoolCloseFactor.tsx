@@ -67,7 +67,7 @@ export const SetPoolCloseFactor = () => {
       // 50% -> 0.5 * 1e18
       const bigCloseFactor: BigNumber = utils.parseUnits((Number(closeFactor) / 100).toString());
 
-      const comptroller = sdk.createComptroller(poolData.comptroller);
+      const comptroller = sdk.createComptroller(poolData.comptroller, sdk.signer);
 
       try {
         const response = await comptroller.callStatic._setCloseFactor(bigCloseFactor);

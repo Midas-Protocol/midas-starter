@@ -1,13 +1,13 @@
 import { Text } from '@chakra-ui/react';
 import { ReactNode, useEffect, useState } from 'react';
-import { useAccount, useDisconnect, useNetwork, useSwitchNetwork, useWalletClient } from 'wagmi';
+import { useAccount, useDisconnect, useNetwork, useSigner, useSwitchNetwork } from 'wagmi';
 
 import { SDKProvider } from '@context/SDKContext';
 
 const CheckConnection = ({ children }: { children: ReactNode }) => {
   const { chain, chains } = useNetwork();
   const { isLoading: isNetworkLoading } = useSwitchNetwork();
-  const { data: walletClient } = useWalletClient();
+  const { data: signerData } = useSigner();
   const { address, isConnecting, isReconnecting, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
 
@@ -15,14 +15,14 @@ const CheckConnection = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const func = async () => {
-      if (typeof walletClient?.getChainId === 'function') {
-        const _signerChainId = await walletClient.getChainId();
+      if (typeof signerData?.getChainId === 'function') {
+        const _signerChainId = await signerData.getChainId();
         setSignerChainId(_signerChainId);
       }
     };
 
     func();
-  }, [walletClient]);
+  }, [signerData]);
 
   if (isConnecting || isReconnecting || isNetworkLoading) {
     return <Text>Loading...</Text>;
@@ -36,9 +36,15 @@ const CheckConnection = ({ children }: { children: ReactNode }) => {
   }
 
   // Everything Fine
-  else if (chain && address && signerChainId === chain.id) {
+  else if (chain && address && signerData?.provider && signerChainId === chain.id) {
     return (
-      <SDKProvider currentChain={chain} chains={chains} address={address} disconnect={disconnect}>
+      <SDKProvider
+        currentChain={chain}
+        chains={chains}
+        address={address}
+        disconnect={disconnect}
+        signer={signerData}
+      >
         {children}
       </SDKProvider>
     );

@@ -81,10 +81,7 @@ export const EnableAssetForRewards = () => {
         setIsEnabling(true);
         const tx = await sdk.addMarketForRewardsToFlywheelCore(
           flywheel.address,
-          selectedAsset.cToken,
-          {
-            from: address,
-          }
+          selectedAsset.cToken
         );
         await tx.wait();
         successToast({ description: 'Successfully enabled!' });

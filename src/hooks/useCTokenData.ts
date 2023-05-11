@@ -6,7 +6,7 @@ export const useCTokenData = (comptrollerAddress?: string, cTokenAddress?: strin
   const { sdk } = useSDK();
 
   return useQuery(
-    ['CTokenData', cTokenAddress, comptrollerAddress],
+    ['useCTokenData', cTokenAddress, comptrollerAddress],
     async () => {
       if (comptrollerAddress && cTokenAddress) {
         const comptroller = sdk.createComptroller(comptrollerAddress);

@@ -80,7 +80,6 @@ export const CreatePool = () => {
         bigCloseFactor,
         bigLiquidationIncentive,
         oracle,
-        { from: address },
         whitelistedAddresses
       );
 
@@ -91,22 +90,24 @@ export const CreatePool = () => {
         return;
       }
 
-      const poolData = await sdk.fetchFusePoolData(poolId.toString(), address);
-      const unitroller = sdk.createUnitroller(poolData.comptroller);
-      const tx = await unitroller._acceptAdmin();
-      await tx.wait();
+      const poolData = await sdk.fetchFusePoolData(poolId.toString(), { from: address });
+      if (poolData) {
+        const unitroller = sdk.createUnitroller(poolData.comptroller, sdk.signer);
+        const tx = await unitroller._acceptAdmin();
+        await tx.wait();
 
-      successToast({
-        title: 'Your pool has been deployed!',
-        description: 'You may now add assets to it.',
-      });
+        successToast({
+          title: 'Your pool has been deployed!',
+          description: 'You may now add assets to it.',
+        });
 
-      setPoolName('');
-      setCloseFactor(CLOSE_FACTOR.DEFAULT);
-      setLiquidationIncentive(LIQUIDATION_INCENTIVE.DEFAULT);
-      setWhitelisted('');
+        setPoolName('');
+        setCloseFactor(CLOSE_FACTOR.DEFAULT);
+        setLiquidationIncentive(LIQUIDATION_INCENTIVE.DEFAULT);
+        setWhitelisted('');
 
-      await queryClient.refetchQueries();
+        await queryClient.refetchQueries();
+      }
     } catch (e) {
       handleGenericError(e, errorToast);
     } finally {

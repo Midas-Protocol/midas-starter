@@ -12,7 +12,6 @@ import { SetCollateralFactor } from '@components/sdk/AssetConfiguration/SetColla
 import { SetInterestModal } from '@components/sdk/AssetConfiguration/SetInterestModal';
 import { SetReserveFactor } from '@components/sdk/AssetConfiguration/SetReserveFactor';
 import { AddExistingFlywheel } from '@components/sdk/Flywheels/AddExistingFlywheel';
-import { DeployNewFlywheel } from '@components/sdk/Flywheels/DeployNewFlywheel';
 import { EnableAssetForRewards } from '@components/sdk/Flywheels/EnableAssetForRewards';
 import { FundFlywheel } from '@components/sdk/Flywheels/FundFlywheel';
 import { Borrow } from '@components/sdk/FundingOperations/Borrow';
@@ -95,7 +94,6 @@ const IndexPage: NextPage = () => {
         <Heading size="md" mt="8" mb="4">
           Flywheels
         </Heading>
-        <DeployNewFlywheel />
         <AddExistingFlywheel />
         <FundFlywheel />
         <EnableAssetForRewards />

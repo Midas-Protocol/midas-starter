@@ -70,13 +70,33 @@ export const Supply = () => {
     if (selectedAsset && poolData?.comptroller) {
       setIsSupplying(true);
       try {
-        const { tx, errorCode } = await sdk.supply(
+        const token = sdk.getEIP20TokenInstance(selectedAsset.underlyingToken, sdk.signer);
+        const hasApprovedEnough = (
+          await token.callStatic.allowance(address, selectedAsset.cToken)
+        ).gte(utils.parseUnits(amount, selectedAsset.underlyingDecimals));
+
+        if (!hasApprovedEnough) {
+          const tx = await sdk.approve(selectedAsset.cToken, selectedAsset.underlyingToken);
+          await tx.wait();
+          successToast({
+            description: 'Successfully Approved!',
+            id: 'Approved - ' + Math.random().toString(),
+          });
+        }
+
+        if (enableCollateral) {
+          const tx = await sdk.enterMarkets(selectedAsset.cToken, poolData.comptroller);
+          await tx.wait();
+
+          successToast({
+            description: 'Collateral enabled!',
+            id: 'Collateral enabled - ' + Math.random().toString(),
+          });
+        }
+
+        const { tx, errorCode } = await sdk.mint(
           selectedAsset.cToken,
-          selectedAsset.underlyingToken,
-          poolData.comptroller,
-          enableCollateral === 'true',
-          utils.parseUnits(amount, selectedAsset.underlyingDecimals),
-          { from: address }
+          utils.parseUnits(amount, selectedAsset.underlyingDecimals)
         );
 
         if (errorCode !== null) {

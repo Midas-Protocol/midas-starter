@@ -13,7 +13,6 @@ import {
   Input,
   Select,
 } from '@chakra-ui/react';
-import { Contract } from 'ethers';
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from 'react-query';
 
@@ -51,11 +50,7 @@ export const SetPoolName = () => {
     if (poolId && poolName) {
       try {
         setIsSetting(true);
-        const FusePoolDirectory = new Contract(
-          sdk.chainDeployment.FusePoolDirectory.address,
-          sdk.chainDeployment.FusePoolDirectory.abi,
-          sdk.provider.getSigner()
-        );
+        const FusePoolDirectory = sdk.getFusePoolDirectoryInstance(sdk.signer);
 
         const tx = await FusePoolDirectory.setPoolName(poolId, poolName, {
           from: address,

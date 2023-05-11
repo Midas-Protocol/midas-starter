@@ -57,7 +57,7 @@ export const BorrowingPossibility = () => {
     if (selectedAsset && poolData) {
       setIsStatus(true);
 
-      const comptroller = sdk.createComptroller(poolData.comptroller);
+      const comptroller = sdk.createComptroller(poolData.comptroller, sdk.signer);
       try {
         const tx = await comptroller._setBorrowPaused(
           selectedAsset.cToken,

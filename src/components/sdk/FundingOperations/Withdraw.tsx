@@ -25,7 +25,7 @@ import { handleGenericError } from '@utils/errorHandling';
 import { fundOperationError } from '@utils/fundOperationError';
 
 export const Withdraw = () => {
-  const { sdk, address } = useSDK();
+  const { sdk } = useSDK();
   const [assetIndex, setAssetIndex] = useState<number>(0);
   const [selectedAsset, setSelectedAsset] = useState<NativePricedFuseAsset | undefined>();
   const [poolId, setPoolId] = useState<string>('');
@@ -67,10 +67,7 @@ export const Withdraw = () => {
       try {
         const { tx, errorCode } = await sdk.withdraw(
           selectedAsset.cToken,
-          utils.parseUnits(amount, selectedAsset.underlyingDecimals),
-          {
-            from: address,
-          }
+          utils.parseUnits(amount, selectedAsset.underlyingDecimals)
         );
 
         if (errorCode !== null) {

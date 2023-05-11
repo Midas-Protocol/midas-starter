@@ -74,7 +74,7 @@ export const SetCollateralFactor = () => {
   const onSetCollateralFactor = async () => {
     if (poolId && poolData && selectedAsset) {
       setIsUpdating(true);
-      const comptroller = sdk.createComptroller(poolData.comptroller);
+      const comptroller = sdk.createComptroller(poolData.comptroller, sdk.signer);
 
       // 70% -> 0.7 * 1e18
       const bigCollateralFactor = utils.parseUnits((Number(collateralFactor) / 100).toString());

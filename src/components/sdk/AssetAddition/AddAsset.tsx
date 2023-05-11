@@ -142,7 +142,7 @@ export const AddAsset = () => {
       };
 
       try {
-        await sdk.deployAsset(marketConfig, { from: address });
+        await sdk.deployAsset(marketConfig);
 
         await queryClient.refetchQueries();
 

@@ -12,7 +12,7 @@ import {
   Input,
   Select,
 } from '@chakra-ui/react';
-import { Contract, utils } from 'ethers';
+import { utils } from 'ethers';
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 
 import { useSDK } from '@context/SDKContext';
@@ -68,11 +68,7 @@ export const FundFlywheel = () => {
 
   const fund = async () => {
     if (flywheel) {
-      const token = new Contract(
-        flywheel.rewardToken,
-        sdk.artifacts.EIP20Interface.abi,
-        sdk.provider.getSigner()
-      );
+      const token = sdk.getEIP20TokenInstance(flywheel.rewardToken, sdk.signer);
 
       setIsFunding(true);
 

@@ -25,7 +25,7 @@ import { handleGenericError } from '@utils/errorHandling';
 import { fundOperationError } from '@utils/fundOperationError';
 
 export const Repay = () => {
-  const { sdk, address } = useSDK();
+  const { sdk } = useSDK();
   const [assetIndex, setAssetIndex] = useState<number>(0);
   const [selectedAsset, setSelectedAsset] = useState<NativePricedFuseAsset | undefined>();
   const [poolId, setPoolId] = useState<string>('');
@@ -67,13 +67,7 @@ export const Repay = () => {
       const bigAmount = utils.parseUnits(amount, selectedAsset.underlyingDecimals);
       const isRepayingMax = bigAmount.eq(selectedAsset.borrowBalance);
       try {
-        const { tx, errorCode } = await sdk.repay(
-          selectedAsset.cToken,
-          selectedAsset.underlyingToken,
-          isRepayingMax,
-          bigAmount,
-          { from: address }
-        );
+        const { tx, errorCode } = await sdk.repay(selectedAsset.cToken, isRepayingMax, bigAmount);
 
         if (errorCode !== null) {
           fundOperationError(errorCode);

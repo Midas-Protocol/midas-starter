@@ -74,7 +74,7 @@ export const SetAdminFee = () => {
   const onSetAdminFee = async () => {
     if (poolId && poolData && selectedAsset) {
       setIsUpdating(true);
-      const cToken = sdk.createCToken(selectedAsset.cToken);
+      const cToken = sdk.createCTokenWithExtensions(selectedAsset.cToken, sdk.signer);
 
       // 70% -> 0.7 * 1e18
       const bigAdminFee = utils.parseUnits((Number(adminFee) / 100).toString());

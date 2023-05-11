@@ -57,7 +57,7 @@ export const RemovingAsset = () => {
     if (selectedAsset && poolData && poolId) {
       try {
         setIsRemoving(true);
-        const comptroller = sdk.createComptroller(poolData.comptroller);
+        const comptroller = sdk.createComptroller(poolData.comptroller, sdk.signer);
         const response = await comptroller.callStatic._unsupportMarket(selectedAsset.cToken);
 
         if (!response.eq(0)) {

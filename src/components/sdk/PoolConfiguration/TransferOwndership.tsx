@@ -56,7 +56,7 @@ export const TransferOwnership = () => {
         setIsTransferring(true);
         const verifiedAddress = utils.getAddress(transferAddress.toLowerCase());
 
-        const unitroller = sdk.createUnitroller(poolData.comptroller);
+        const unitroller = sdk.createUnitroller(poolData.comptroller, sdk.signer);
 
         const tx = await unitroller._setPendingAdmin(verifiedAddress);
         await tx.wait();

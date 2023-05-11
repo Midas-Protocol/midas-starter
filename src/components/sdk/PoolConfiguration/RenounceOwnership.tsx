@@ -13,7 +13,7 @@ import {
   Select,
 } from '@chakra-ui/react';
 import { ComptrollerErrorCodes } from '@midas-capital/types';
-import { Contract, ContractTransaction } from 'ethers';
+import { ContractTransaction } from 'ethers';
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from 'react-query';
 
@@ -49,11 +49,7 @@ export const RenounceOwnership = () => {
   const onRenounceOwnership = async () => {
     if (poolId && poolData) {
       setIsRenouncing(true);
-      const unitroller = new Contract(
-        poolData.comptroller,
-        sdk.artifacts.Unitroller.abi,
-        sdk.provider.getSigner()
-      );
+      const unitroller = sdk.getUnitrollerInstance(poolData.comptroller, sdk.signer);
 
       try {
         const response = await unitroller.callStatic._toggleAdminRights(false);

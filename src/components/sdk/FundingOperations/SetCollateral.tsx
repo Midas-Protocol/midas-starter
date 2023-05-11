@@ -60,7 +60,7 @@ export const SetCollateral = () => {
     if (poolData?.comptroller && selectedAsset) {
       setIsSetting(true);
       try {
-        const comptroller = sdk.createComptroller(poolData.comptroller);
+        const comptroller = sdk.createComptroller(poolData.comptroller, sdk.signer);
 
         let tx: ContractTransaction;
         if (selectedAsset.membership) {

@@ -59,7 +59,7 @@ export const SetWhitelist = () => {
 
   const changeWhitelistStatus = async (enforce: boolean) => {
     if (poolData) {
-      const comptroller = sdk.createComptroller(poolData.comptroller);
+      const comptroller = sdk.createComptroller(poolData.comptroller, sdk.signer);
 
       try {
         const response = await comptroller.callStatic._setWhitelistEnforcement(enforce);
@@ -83,7 +83,7 @@ export const SetWhitelist = () => {
     if (whitelistAddress && poolData && extraData) {
       setIsAdding(true);
       const validAddress = utils.getAddress(whitelistAddress.toLowerCase());
-      const comptroller = sdk.createComptroller(poolData.comptroller);
+      const comptroller = sdk.createComptroller(poolData.comptroller, sdk.signer);
 
       const newList = [...extraData.whitelist, validAddress];
 
